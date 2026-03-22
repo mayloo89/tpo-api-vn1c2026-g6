@@ -1,0 +1,37 @@
+name: EOL Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  eol:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate LF line endings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Fail if CRLF is found in tracked files that should use LF.
+          if git grep -nI $'\r' -- \
+            . \
+            ':(exclude)*.cmd' \
+            ':(exclude)*.bat' \
+            ':(exclude).git/**' \
+            ':(exclude)target/**'
+          then
+            echo ""
+            echo "CRLF detected in files that must use LF."
+            echo "Fix with: git add --renormalize ."
+            exit 1
+          fi
+
+          echo "Line endings OK"
