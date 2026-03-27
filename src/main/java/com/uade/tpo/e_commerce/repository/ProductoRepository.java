@@ -1,7 +1,8 @@
 package com.uade.tpo.e_commerce.repository;
 
-import com.uade.tpo.e_commerce.model.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.uade.tpo.e_commerce.model.Producto;
 
 /*
 * En repository se definen las interfaces que extienden JpaRepository para cada entidad.
