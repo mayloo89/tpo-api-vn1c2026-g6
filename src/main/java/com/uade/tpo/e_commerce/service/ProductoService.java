@@ -2,13 +2,13 @@ package com.uade.tpo.e_commerce.service;
 
 import java.util.List;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.e_commerce.model.Producto;
 import com.uade.tpo.e_commerce.repository.ProductoRepository;
-
-import jakarta.transaction.Transactional;
 
 /*
 * En service se definen las clases que contienen la lógica de negocio para cada entidad.
@@ -53,6 +53,15 @@ public class ProductoService {
     public Producto saveProducto(Producto producto) { 
         return productoRepository.save(producto); 
         
+    }
+
+    /**
+     * Elimina un producto por su id.
+     */
+    public void deleteProducto(Long id) {
+        if (id != null && productoRepository.existsById(id)) {
+            productoRepository.deleteById(id);
+        }
     }
     
 }

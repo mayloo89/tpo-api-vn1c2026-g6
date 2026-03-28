@@ -3,9 +3,11 @@ package com.uade.tpo.e_commerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,5 +63,34 @@ public class ProductoController {
     // Lee el JSON del cuerpo de la solicitud y lo convierte en un objeto Producto
     public Producto saveProducto(@RequestBody Producto producto) {
         return productoService.saveProducto(producto);
+    }
+
+    /**
+     * Endpoint para eliminar un producto.
+     * DELETE /api/productos/{id}
+     */
+    @DeleteMapping("/{id}")
+    public void deleteProducto(@PathVariable Long id) {
+        productoService.deleteProducto(id);
+    }
+
+    /**
+     * Endpoint para actualizar un producto existente.
+     * PUT /api/productos/{id}
+     */
+    @PutMapping("/{id}")
+    public Producto updateProducto(@PathVariable Long id, @RequestBody Producto producto) {
+        // Para actualizar, primero obtenemos el producto existente
+        Producto existingProducto = productoService.getProductoById(id);
+        if (existingProducto == null) {
+            return null;
+        }
+        // Actualizamos los campos del producto existente con los nuevos valores
+        existingProducto.setNombre(producto.getNombre());
+        existingProducto.setDescripcion(producto.getDescripcion());
+        existingProducto.setPrecio(producto.getPrecio());
+        existingProducto.setStock(producto.getStock());
+        // Guardamos el producto actualizado
+        return productoService.saveProducto(existingProducto);
     }
 }

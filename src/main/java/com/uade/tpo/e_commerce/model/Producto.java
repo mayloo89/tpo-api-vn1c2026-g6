@@ -1,7 +1,7 @@
 package com.uade.tpo.e_commerce.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,4 +42,18 @@ public class Producto {
      * Campo opcional que puede ser nulo.
      */
     private String descripcion;
+
+    /**
+     * Precio del producto.
+     * Campo obligatorio que no puede ser nulo.
+     */
+    @Column(nullable = false)
+    private Double precio;
+
+    /**
+     * Cantidad en stock del producto.
+     * Campo obligatorio que no puede ser nulo.
+     */
+    @Column(nullable = false)
+    private Integer stock;
 }
