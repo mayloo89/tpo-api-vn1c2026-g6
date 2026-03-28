@@ -59,7 +59,7 @@ public class ProductoService {
      * Elimina un producto por su id.
      */
     public void deleteProducto(Long id) {
-        if (id != null) {
+        if (id != null && productoRepository.existsById(id)) {
             productoRepository.deleteById(id);
         }
     }

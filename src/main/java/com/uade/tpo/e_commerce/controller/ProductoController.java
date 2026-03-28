@@ -65,7 +65,7 @@ public class ProductoController {
         return productoService.saveProducto(producto);
     }
 
-        /**
+    /**
      * Endpoint para eliminar un producto.
      * DELETE /api/productos/{id}
      */
@@ -83,7 +83,7 @@ public class ProductoController {
         // Para actualizar, primero obtenemos el producto existente
         Producto existingProducto = productoService.getProductoById(id);
         if (existingProducto == null) {
-            return null; // O lanzar una excepción si prefieres
+            return null;
         }
         // Actualizamos los campos del producto existente con los nuevos valores
         existingProducto.setNombre(producto.getNombre());

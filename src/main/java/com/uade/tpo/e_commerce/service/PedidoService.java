@@ -41,5 +41,15 @@ public class PedidoService {
     public Pedido addPedido(Pedido pedido) {
         return pedidoRepository.save(pedido);
     }
+
+    /**
+     * Elimina un pedido por su id.
+     * Si el pedido no existe, no hace nada.
+     */
+    public void deletePedido(Long id) {
+        if (id != null && pedidoRepository.existsById(id)) {
+            pedidoRepository.deleteById(id);
+        }
+    }
 }
 
