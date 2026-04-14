@@ -1,11 +1,19 @@
 package com.uade.tpo.e_commerce.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 
 /*
@@ -19,6 +27,7 @@ import lombok.Data;
  * Utiliza Lombok para generar automáticamente getters, setters, toString, equals y hashCode.
  */
 @Data // Genera automáticamente getters, setters, toString, equals y hashCode
+@Builder
 @Entity // Marca esta clase como una entidad persistente de JPA
 @Table(name = "productos") // Define el nombre de la tabla en la base de datos
 public class Producto {
@@ -56,4 +65,12 @@ public class Producto {
      */
     @Column(nullable = false)
     private Integer stock;
+
+    @ManyToMany(fetch = FetchType.LAZY) // Define una relación de muchos a muchos con la entidad Categoria
+    @JoinTable(
+        name = "producto_categoria",
+        joinColumns = @JoinColumn(name = "producto_id"),
+        inverseJoinColumns = @JoinColumn(name = "categoria_id")
+    )
+    private List<Categoria> categorias = new ArrayList<>(); // Lista de categorías a las que pertenece el producto
 }
