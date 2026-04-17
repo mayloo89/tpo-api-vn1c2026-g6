@@ -7,6 +7,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.e_commerce.dto.ProductoResponseDTO;
+import com.uade.tpo.e_commerce.dto.ProductoRequestDTO;
+import com.uade.tpo.e_commerce.dto.ProductoUpdateDTO;
 import com.uade.tpo.e_commerce.model.Producto;
 import com.uade.tpo.e_commerce.repository.ProductoRepository;
 
@@ -28,8 +31,10 @@ public class ProductoService {
      *
      * @return lista de todos los productos
      */
-    public List<Producto> getAllProductos() {
-        return productoRepository.findAll();
+    public List<ProductoResponseDTO> getAllProductos() {
+        return productoRepository.findAll().stream()
+                .map(this::toProductoResponseDTO)
+                .toList();
     }
     
     /**
@@ -39,29 +44,64 @@ public class ProductoService {
      * @param id el identificador del producto
      * @return el producto encontrado, o null si no existe
      */
-    public Producto getProductoById(Long id) {
-        return productoRepository.findById(id).orElse(null);
+    public ProductoResponseDTO getProductoById(Long id) {
+        Producto producto = productoRepository.findById(id).orElse(null);
+        if (producto == null) {
+            return null; // Devuelve null si el producto no existe
+        }
+        return toProductoResponseDTO(producto); // Devuelve un DTO con los datos del producto encontrado
     }
 
     /**
      * Guarda un nuevo producto o actualiza uno existente en la base de datos.
      * Utiliza el servicio JPA {@link ProductoRepository#save(Object)}
      *
-     * @param producto el producto a guardar o actualizar
-     * @return el producto guardado con su ID asignado
+     * @param productoRequestDTO el DTO con los datos del producto a guardar o actualizar
+     * @return el producto guardado o actualizado, con su ID asignado si es nuevo
      */
-    public Producto saveProducto(Producto producto) { 
-        return productoRepository.save(producto); 
-        
+    public ProductoResponseDTO saveProducto(ProductoRequestDTO productoRequestDTO) { 
+        if (productoRequestDTO.getPrecio() < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
+
+        Producto producto = Producto.builder()
+                .nombre(productoRequestDTO.getNombre())
+                .descripcion(productoRequestDTO.getDescripcion())
+                .precio(productoRequestDTO.getPrecio())
+            .stock(productoRequestDTO.getStock())
+                .build();
+        Producto productoAdd= productoRepository.save(producto);
+        return toProductoResponseDTO(productoAdd);
     }
 
     /**
      * Elimina un producto por su id.
      */
-    public void deleteProducto(Long id) {
-        if (id != null && productoRepository.existsById(id)) {
-            productoRepository.deleteById(id);
-        }
+    public void deleteProductoById(Long id) {
+        productoRepository.deleteById(id);
     }
     
+
+    public ProductoResponseDTO updateProducto(Long id, ProductoUpdateDTO productoRequestDTO) {
+        Producto existingProducto = productoRepository.findById(id).orElse(null);
+        if (existingProducto == null) {
+            return null; // Devuelve null si el producto no existe
+        }
+
+        // Actualizamos solo los campos que se permiten modificar (precio y stock)
+        existingProducto.setPrecio(productoRequestDTO.getPrecio());
+        existingProducto.setStock(productoRequestDTO.getStock());
+
+        Producto productoUpdated = productoRepository.save(existingProducto);
+        return toProductoResponseDTO(productoUpdated);
+    }
+
+    private ProductoResponseDTO toProductoResponseDTO(Producto producto) {
+        return new ProductoResponseDTO(
+                producto.getId(),
+                producto.getNombre(),
+                producto.getDescripcion(),
+                producto.getPrecio(),
+                producto.getStock());
+    }
 }
