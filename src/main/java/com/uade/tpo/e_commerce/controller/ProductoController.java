@@ -2,7 +2,6 @@ package com.uade.tpo.e_commerce.controller;
 
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,16 +49,12 @@ public class ProductoController {
      * Obtiene un producto específico por su ID.
      *
      * @param id identificador del producto
-     * @return el producto encontrado o una respuesta 404 si no existe
+     * @return el producto encontrado
      */
     @GetMapping("/{id}") // Maneja solicitudes GET a la ruta /api/productos/{id}, donde {id} es un parámetro dinámico
     // Extrae el valor de {id} de la ruta y lo pasa como parámetro al método
     public ResponseEntity<ProductoResponseDTO> getProductoByID(@PathVariable Long id) {
-        @Nullable ProductoResponseDTO productoResponseDTO = productoService.getProductoById(id); 
-        if (productoResponseDTO == null) {
-            return ResponseEntity.notFound().build(); // Devuelve 404 si el producto no existe
-        }
-
+        ProductoResponseDTO productoResponseDTO = productoService.getProductoById(id);
         return new ResponseEntity<ProductoResponseDTO>(productoResponseDTO, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto
     }
 
@@ -91,16 +86,12 @@ public class ProductoController {
      * PUT /api/productos/{id}
      * @param id el ID del producto a actualizar
      * @param producto el DTO con los datos actualizados del producto, recibido en el cuerpo de la solicitud como JSON
-     * @return el producto actualizado con status 200 o una respuesta 404 si no existe
+     * @return el producto actualizado con status 200
      */
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO producto) {
         // Llama al servicio para actualizar el producto con el ID especificado y los datos proporcionados en el cuerpo de la solicitud
         ProductoResponseDTO updatedProducto = productoService.updateProducto(id, producto);
-        if (updatedProducto == null) {
-            return ResponseEntity.notFound().build(); // Devuelve 404 si el producto no existe
-        }
-
         return new ResponseEntity<ProductoResponseDTO>(updatedProducto, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto actualizado
     }
 
