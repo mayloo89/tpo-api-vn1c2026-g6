@@ -65,17 +65,6 @@ public class PedidoController {
      */
     @PutMapping("/{id}")
     public Pedido updatePedido(@PathVariable Long id, @RequestBody Pedido pedido) {
-        // Para actualizar un pedido, primero obtenemos el pedido existente por su id
-        Pedido existingPedido = pedidoService.getPedidoById(id);
-        if (existingPedido == null) {
-            return null; // Si el pedido no existe, retornamos null
-        }
-
-        // Actualizamos los campos del pedido existente con los datos del pedido recibido en la solicitud
-        existingPedido.setDescripcion(pedido.getDescripcion());
-        existingPedido.setCantidad(pedido.getCantidad());
-
-        // Guardamos el pedido actualizado en la base de datos
-        return pedidoService.addPedido(existingPedido);
+        return pedidoService.updatePedido(id, pedido);
     }
 }

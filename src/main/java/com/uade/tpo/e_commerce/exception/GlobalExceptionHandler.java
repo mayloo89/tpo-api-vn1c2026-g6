@@ -32,6 +32,32 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja errores cuando un pedido no existe.
+     *
+     * @param ex excepción de pedido no encontrado
+     * @return respuesta HTTP 404 con el detalle del error
+     */
+    @ExceptionHandler(PedidoNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(PedidoNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    /**
+     * Maneja errores cuando un usuario no existe.
+     *
+     * @param ex excepción de usuario no encontrado
+     * @return respuesta HTTP 404 con el detalle del error
+     */
+    @ExceptionHandler(UsuarioNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(UsuarioNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    /**
      * Maneja errores de ejecución no controlados específicamente.
      *
      * @param ex excepción de runtime
