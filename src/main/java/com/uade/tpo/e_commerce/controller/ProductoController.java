@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.e_commerce.dto.ProductoDTO;
-import com.uade.tpo.e_commerce.model.Producto;
+import com.uade.tpo.e_commerce.dto.ProductoRequestDTO;
+import com.uade.tpo.e_commerce.dto.ProductoResponseDTO;
+import com.uade.tpo.e_commerce.dto.ProductoUpdateDTO;
 import com.uade.tpo.e_commerce.service.ProductoService;
 
 /*
@@ -41,7 +42,7 @@ public class ProductoController {
      * @return lista de todos los productos
      */
     @GetMapping // Maneja solicitudes GET a la ruta base /api/productos (definida por @RequestMapping)
-    public List<Producto> getAllProductos() {
+    public List<ProductoResponseDTO> getAllProductos() {
         return productoService.getAllProductos();
     }
 
@@ -49,25 +50,31 @@ public class ProductoController {
      * Obtiene un producto específico por su ID.
      *
      * @param id identificador del producto
-     * @return el producto encontrado
-     *
+     * @return el producto encontrado o una respuesta 404 si no existe
+     */
     @GetMapping("/{id}") // Maneja solicitudes GET a la ruta /api/productos/{id}, donde {id} es un parámetro dinámico
     // Extrae el valor de {id} de la ruta y lo pasa como parámetro al método
-    public Producto getProductoById(@PathVariable Long id) {
-        return productoService.getProductoById(id);
-    }*/
+    public ResponseEntity<ProductoResponseDTO> getProductoByID(@PathVariable Long id) {
+        @Nullable ProductoResponseDTO productoResponseDTO = productoService.getProductoById(id); 
+        if (productoResponseDTO == null) {
+            return ResponseEntity.notFound().build(); // Devuelve 404 si el producto no existe
+        }
+
+        return new ResponseEntity<ProductoResponseDTO>(productoResponseDTO, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto
+    }
 
     /**
      * Crea un nuevo producto en la base de datos.
      *
-     * @param producto datos del producto a crear
+     * @param producto el producto a crear, recibido en el cuerpo de la solicitud como JSON
      * @return el producto creado con su ID asignado
-     *
+     */
     @PostMapping // Maneja solicitudes POST a la ruta /api/productos
     // Lee el JSON del cuerpo de la solicitud y lo convierte en un objeto Producto
-    public Producto saveProducto(@RequestBody Producto producto) {
-        return productoService.saveProducto(producto);
-    }*/
+    public ResponseEntity<ProductoResponseDTO> saveProducto(@RequestBody ProductoRequestDTO productoRequestDTO) {
+        ProductoResponseDTO savedProducto = productoService.saveProducto(productoRequestDTO);
+        return new ResponseEntity<ProductoResponseDTO>(savedProducto, HttpStatus.CREATED); // Devuelve 201 Created con el DTO del producto creado
+    }
 
     /**
      * Endpoint para eliminar un producto.
@@ -82,47 +89,19 @@ public class ProductoController {
     /**
      * Endpoint para actualizar un producto existente.
      * PUT /api/productos/{id}
-     *
+     * @param id el ID del producto a actualizar
+     * @param producto el DTO con los datos actualizados del producto, recibido en el cuerpo de la solicitud como JSON
+     * @return el producto actualizado con status 200 o una respuesta 404 si no existe
+     */
     @PutMapping("/{id}")
-    public Producto updateProducto(@PathVariable Long id, @RequestBody Producto producto) {
-        // Para actualizar, primero obtenemos el producto existente
-        Producto existingProducto = productoService.getProductoById(id);
-        if (existingProducto == null) {
-            return null;
-        }
-        // Actualizamos los campos del producto existente con los nuevos valores
-        existingProducto.setNombre(producto.getNombre());
-        existingProducto.setDescripcion(producto.getDescripcion());
-        existingProducto.setPrecio(producto.getPrecio());
-        existingProducto.setStock(producto.getStock());
-        // Guardamos el producto actualizado
-        return productoService.saveProducto(existingProducto);
-    }*/
-
-        // DTO: Data Transfer Object, es una clase que se utiliza para transferir datos entre capas de la aplicación, en este caso entre el controlador y el servicio. El DTO suele contener solo los campos necesarios para la operación específica, lo que ayuda a evitar exponer toda la entidad del modelo y a mejorar la seguridad y el rendimiento.
-
-     @GetMapping("/{id}")
-    public ResponseEntity<ProductoDTO> getProductoByID(@PathVariable Long id) {
-        @Nullable ProductoDTO productoDTO = productoService.getProductoById(id);
-        if (productoDTO == null) {
+    public ResponseEntity<ProductoResponseDTO> updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO producto) {
+        // Llama al servicio para actualizar el producto con el ID especificado y los datos proporcionados en el cuerpo de la solicitud
+        ProductoResponseDTO updatedProducto = productoService.updateProducto(id, producto);
+        if (updatedProducto == null) {
             return ResponseEntity.notFound().build(); // Devuelve 404 si el producto no existe
         }
 
-        return new ResponseEntity<ProductoDTO>(productoDTO, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto
+        return new ResponseEntity<ProductoResponseDTO>(updatedProducto, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto actualizado
     }
 
-    @PostMapping
-    public ResponseEntity<ProductoDTO> saveProducto(@RequestBody ProductoDTO productoDTO) {
-        ProductoDTO savedProducto = productoService.saveProducto(productoDTO);
-        return new ResponseEntity<>(savedProducto, HttpStatus.CREATED); // Devuelve 201 Created con el DTO del producto creado
-    }
-
-    @PutMapping("/{id}")
-    public ProductoDTO updateProducto(@PathVariable Long id, @RequestBody ProductoDTO productoDTO) {
-        ProductoDTO updatedProducto = productoService.updateProducto1(id, productoDTO);
-        if (updatedProducto == null) {
-            return null; // Devuelve null si el producto no existe
-        }
-        return updatedProducto; // Devuelve el DTO del producto actualizado
-    }
 }

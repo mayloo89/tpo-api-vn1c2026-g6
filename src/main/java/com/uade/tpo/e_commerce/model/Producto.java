@@ -14,6 +14,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 
 /*
@@ -72,5 +73,6 @@ public class Producto {
         joinColumns = @JoinColumn(name = "producto_id"),
         inverseJoinColumns = @JoinColumn(name = "categoria_id")
     )
+    @Default
     private List<Categoria> categorias = new ArrayList<>(); // Lista de categorías a las que pertenece el producto
 }
