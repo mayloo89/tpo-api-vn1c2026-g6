@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductoUpdateDTO {
-    private Double precio;
-    private Integer stock;
+public class PedidoRequestDTO {
+    private String descripcion;
+    private Integer cantidad;
 }

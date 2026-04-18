@@ -2,77 +2,84 @@ package com.uade.tpo.e_commerce.service;
 
 import java.util.List;
 
-import jakarta.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.tpo.e_commerce.exception.UsuarioNotFoundException;
+import com.uade.tpo.e_commerce.model.Role;
 import com.uade.tpo.e_commerce.model.Usuario;
 import com.uade.tpo.e_commerce.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-
 public class UsuarioService {
-
+    
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    /**
-     * Devuelve la lista completa de usuarios registrados.
-     */
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    /**
-     * Busca un usuario por su id.
-     */
-    public Usuario getUsuarioById(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("El ID no puede ser nulo");
+    public List<UsuarioResponseDTO> getAllUsuarios() {
+        return usuarioRepository.findAll().stream()
+            .map(this::toResponse)
+                .toList();
+                }
+
+    public UsuarioResponseDTO getUsuarioById(Long id) {
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario == null) {
+            throw new UsuarioNotFoundException ("Usuario no encontrado con id: " + id);
         }
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
+        return toResponse(usuario);
     }
 
-    /**
-     * Crea un nuevo usuario o actualiza uno existente si el id ya existe.
-     */
-    public Usuario addUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
-    }
-
-    /**
-     * Actualiza los datos de un usuario existente.
-     */
-    public Usuario updateUsuario(Long id, Usuario usuario) {
-        if (id == null) {
-            throw new IllegalArgumentException("El ID no puede ser nulo");
+    public UsuarioResponseDTO addUsuario(Usuario usuario) {
+        if (usuario.getRole() == null) {
+            usuario.setRole(Role.USER);
         }
+        if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+        Usuario saved = usuarioRepository.save(usuario);
+        return toResponse(saved);
+    }
+
+    public UsuarioResponseDTO updateUsuario(Long id, Usuario usuario) {
         Usuario existing = usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con id: " + id));
 
         existing.setNombre(usuario.getNombre());
+        existing.setApellido(usuario.getApellido());
         existing.setEmail(usuario.getEmail());
-        existing.setPassword(usuario.getPassword());
-        return usuarioRepository.save(existing);
+        if (usuario.getRole() != null) {
+            existing.setRole(usuario.getRole());
+        }
+        if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
+            existing.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+
+        Usuario updated = usuarioRepository.save(existing);
+        return toResponse(updated);
     }
 
-    /**
-     * Elimina un usuario por su id si existe en la base de datos.
-     */
     public void deleteUsuario(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("El ID no puede ser nulo");
-        }
-
         if (!usuarioRepository.existsById(id)) {
-            throw new UsuarioNotFoundException("Usuario no existe");
+            throw new UsuarioNotFoundException("Usuario no encontrado con id: " + id);
         }
-
         usuarioRepository.deleteById(id);
+    }
+
+    private UsuarioResponseDTO toResponse(Usuario usuario) {
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getApellido(),
+                usuario.getEmail(),
+                usuario.getRole() != null ? usuario.getRole().name() : Role.USER.name());
     }
 
 }

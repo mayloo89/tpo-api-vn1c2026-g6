@@ -1,30 +1,30 @@
 package com.uade.tpo.e_commerce.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.List;
+import java.util.ArrayList;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "categorias")
 public class Categoria {
     
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false)
+    @Column(nullable = false)    
     private String nombre;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "categorias")
-    private List<Producto> productos = new ArrayList<>(); 
-    
+    private List<Producto> productos = new ArrayList<>();
+    //categoria.getProductos(); // trae los productos de la categoria
 }

@@ -4,69 +4,55 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/*
- * En exception se definen clases para centralizar el manejo de errores de la API.
- * Estas clases permiten devolver respuestas HTTP consistentes ante fallos de negocio o validación.
- */
-
-/**
- * Manejador global de excepciones para toda la aplicación.
- *
- * Captura excepciones lanzadas por controllers y services, y las transforma
- * en respuestas HTTP claras para el cliente.
- */
-@RestControllerAdvice
+// Anotación que indica que esta clase manejará excepciones de forma global para todos los controladores.
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Maneja errores cuando un producto no existe.
-     *
-     * @param ex excepción de producto no encontrado
-     * @return respuesta HTTP 404 con el detalle del error
-     */
+    // Anotación que indica que este método manejará las excepciones de tipo ProductoNotFoundException.
     @ExceptionHandler(ProductoNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(ProductoNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+    // Este método se ejecuta cuando se lanza una ProductoNotFoundException.
+    public ResponseEntity<String> manejarProductoNoEncontrado(ProductoNotFoundException ex) {
+
+        // Devuelve una respuesta con el código de estado HTTP 404 (Not Found) y un cuerpo con el mensaje "Producto no encontrado :)"
+        //representa la respuesta HTTP completa que se envía desde tu controlador al cliente (navegador, aplicación móvil, etc.).
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        //not_found es el código de error
+        //body va el json con el mensaje de error
+        
     }
 
-    /**
-     * Maneja errores cuando un pedido no existe.
-     *
-     * @param ex excepción de pedido no encontrado
-     * @return respuesta HTTP 404 con el detalle del error
-     */
-    @ExceptionHandler(PedidoNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(PedidoNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+    @ExceptionHandler(PrecioNegativoException.class)
+    public ResponseEntity<String> manejarPrecioNegativo(PrecioNegativoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    /**
-     * Maneja errores cuando un usuario no existe.
-     *
-     * @param ex excepción de usuario no encontrado
-     * @return respuesta HTTP 404 con el detalle del error
-     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> manejarArgumentoInvalido(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> manejarErroresGenerales(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<String> manejarEmailExistente(EmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
     @ExceptionHandler(UsuarioNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(UsuarioNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+    public ResponseEntity<String> manejarUsuarioNoEncontrado(UsuarioNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    /**
-     * Maneja errores de ejecución no controlados específicamente.
-     *
-     * @param ex excepción de runtime
-     * @return respuesta HTTP 400 con el detalle del error
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntime(RuntimeException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
+    @ExceptionHandler(CategoriaNotFoundException.class)
+    public ResponseEntity<String> manejarCategoriaNoEncontrada(CategoriaNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PedidoNotFoundException.class)
+    public ResponseEntity<String> manejarPedidoNoEncontrado(PedidoNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

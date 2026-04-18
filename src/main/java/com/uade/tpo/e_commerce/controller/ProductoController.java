@@ -2,7 +2,11 @@ package com.uade.tpo.e_commerce.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.uade.tpo.e_commerce.dto.ProductoRequestDTO;
+import com.uade.tpo.e_commerce.dto.ProductoResponseDTO;
+import com.uade.tpo.e_commerce.dto.ProductoUpdateDTO;
+import com.uade.tpo.e_commerce.service.ProductoService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,33 +18,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.e_commerce.dto.ProductoRequestDTO;
-import com.uade.tpo.e_commerce.dto.ProductoResponseDTO;
-import com.uade.tpo.e_commerce.dto.ProductoUpdateDTO;
-import com.uade.tpo.e_commerce.service.ProductoService;
-
-/*
- * En controller se definen las clases que manejan las solicitudes HTTP y devuelven respuestas HTTP.
- * Estas clases interactúan con los services para realizar operaciones sobre los datos y devolver los resultados al cliente.
- */
-
 /**
  * Controlador REST que maneja las operaciones CRUD para productos.
  * Expone endpoints en /api/productos para gestionar la información de productos.
  */
-@RestController // Marca esta clase como un controlador REST que maneja solicitudes HTTP y devuelve respuestas en formato JSON
-@RequestMapping("/api/productos") // Define la ruta base para todos los endpoints de este controlador
+@RestController
+@RequestMapping("/api/productos")
 public class ProductoController {
-    
-    @Autowired // Inyecta automáticamente una instancia de ProductoService desde el contenedor de Spring
-    private ProductoService productoService;
+
+    private final ProductoService productoService;
+
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
 
     /**
      * Obtiene todos los productos disponibles.
      *
      * @return lista de todos los productos
      */
-    @GetMapping // Maneja solicitudes GET a la ruta base /api/productos (definida por @RequestMapping)
+    @GetMapping
     public List<ProductoResponseDTO> getAllProductos() {
         return productoService.getAllProductos();
     }
@@ -51,48 +48,49 @@ public class ProductoController {
      * @param id identificador del producto
      * @return el producto encontrado
      */
-    @GetMapping("/{id}") // Maneja solicitudes GET a la ruta /api/productos/{id}, donde {id} es un parámetro dinámico
-    // Extrae el valor de {id} de la ruta y lo pasa como parámetro al método
-    public ResponseEntity<ProductoResponseDTO> getProductoByID(@PathVariable Long id) {
-        ProductoResponseDTO productoResponseDTO = productoService.getProductoById(id);
-        return new ResponseEntity<ProductoResponseDTO>(productoResponseDTO, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoResponseDTO> getProductoById(@PathVariable Long id) {
+        ProductoResponseDTO productoResponse = productoService.getProductoById(id);
+        return new ResponseEntity<>(productoResponse, HttpStatus.OK);
     }
 
     /**
      * Crea un nuevo producto en la base de datos.
      *
-     * @param producto el producto a crear, recibido en el cuerpo de la solicitud como JSON
-     * @return el producto creado con su ID asignado
+     * @param productoRequest producto a crear, recibido en el body de la solicitud
+     * @return producto creado con status 201
      */
-    @PostMapping // Maneja solicitudes POST a la ruta /api/productos
-    // Lee el JSON del cuerpo de la solicitud y lo convierte en un objeto Producto
-    public ResponseEntity<ProductoResponseDTO> saveProducto(@RequestBody ProductoRequestDTO productoRequestDTO) {
-        ProductoResponseDTO savedProducto = productoService.saveProducto(productoRequestDTO);
-        return new ResponseEntity<ProductoResponseDTO>(savedProducto, HttpStatus.CREATED); // Devuelve 201 Created con el DTO del producto creado
+    @PostMapping
+    public ResponseEntity<ProductoResponseDTO> saveProducto(@RequestBody ProductoRequestDTO productoRequest) {
+        ProductoResponseDTO savedProducto = productoService.saveProducto(productoRequest);
+        return new ResponseEntity<>(savedProducto, HttpStatus.CREATED);
     }
 
     /**
-     * Endpoint para eliminar un producto.
-     * DELETE /api/productos/{id}
+     * Elimina un producto por su ID.
+     *
+     * @param id identificador del producto
+     * @return respuesta sin contenido (204)
      */
     @DeleteMapping("/{id}")
-    public void deleteProducto(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProductoById(@PathVariable Long id) {
         productoService.deleteProductoById(id);
-    }   
-
+        return ResponseEntity.noContent().build();
+    }
 
     /**
-     * Endpoint para actualizar un producto existente.
-     * PUT /api/productos/{id}
-     * @param id el ID del producto a actualizar
-     * @param producto el DTO con los datos actualizados del producto, recibido en el cuerpo de la solicitud como JSON
-     * @return el producto actualizado con status 200
+     * Actualiza precio y stock de un producto existente.
+     *
+     * @param id identificador del producto
+     * @param productoUpdateDTO datos de actualización del producto
+     * @return producto actualizado con status 200
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO producto) {
-        // Llama al servicio para actualizar el producto con el ID especificado y los datos proporcionados en el cuerpo de la solicitud
-        ProductoResponseDTO updatedProducto = productoService.updateProducto(id, producto);
-        return new ResponseEntity<ProductoResponseDTO>(updatedProducto, HttpStatus.OK); // Devuelve 200 OK con el DTO del producto actualizado
+    public ResponseEntity<ProductoResponseDTO> updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO productoUpdateDTO) {
+        ProductoResponseDTO updatedProducto = productoService.updateProducto(id, productoUpdateDTO);
+        return new ResponseEntity<>(updatedProducto, HttpStatus.OK);
     }
 
 }
+    
+
