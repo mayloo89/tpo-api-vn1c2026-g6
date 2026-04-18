@@ -3,6 +3,7 @@ package com.uade.tpo.e_commerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.e_commerce.model.Pedido;
+import com.uade.tpo.e_commerce.dto.PedidoRequestDTO;
+import com.uade.tpo.e_commerce.dto.PedidoResponseDTO;
 import com.uade.tpo.e_commerce.service.PedidoService;
 
 @RestController
@@ -28,7 +30,7 @@ public class PedidoController {
      * GET /api/pedidos
      */
     @GetMapping
-    public List<Pedido> getAllPedidos() {
+    public List<PedidoResponseDTO> getAllPedidos() {
         return pedidoService.getAllPedidos();
     }
 
@@ -37,7 +39,7 @@ public class PedidoController {
      * GET /api/pedidos/{id}
      */
     @GetMapping("/{id}")
-    public Pedido getPedidoById(@PathVariable Long id) {
+    public PedidoResponseDTO getPedidoById(@PathVariable Long id) {
         return pedidoService.getPedidoById(id);
     }
 
@@ -46,8 +48,8 @@ public class PedidoController {
      * POST /api/pedidos
      */
     @PostMapping
-    public Pedido addPedido(@RequestBody Pedido pedido) {
-        return pedidoService.addPedido(pedido);
+    public PedidoResponseDTO addPedido(@RequestBody PedidoRequestDTO pedidoDTO) {
+        return pedidoService.addPedido(pedidoDTO);
     }
 
     /**
@@ -55,8 +57,9 @@ public class PedidoController {
      * DELETE /api/pedidos/{id}
      */
     @DeleteMapping("/{id}")
-    public void deletePedido(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePedido(@PathVariable Long id) {
         pedidoService.deletePedido(id);
+        return ResponseEntity.noContent().build();
     }
 
     /** 
@@ -64,18 +67,7 @@ public class PedidoController {
      * PUT /api/pedidos/{id}
      */
     @PutMapping("/{id}")
-    public Pedido updatePedido(@PathVariable Long id, @RequestBody Pedido pedido) {
-        // Para actualizar un pedido, primero obtenemos el pedido existente por su id
-        Pedido existingPedido = pedidoService.getPedidoById(id);
-        if (existingPedido == null) {
-            return null; // Si el pedido no existe, retornamos null
-        }
-
-        // Actualizamos los campos del pedido existente con los datos del pedido recibido en la solicitud
-        existingPedido.setDescripcion(pedido.getDescripcion());
-        existingPedido.setCantidad(pedido.getCantidad());
-
-        // Guardamos el pedido actualizado en la base de datos
-        return pedidoService.addPedido(existingPedido);
+    public PedidoResponseDTO updatePedido(@PathVariable Long id, @RequestBody PedidoRequestDTO pedidoDTO) {
+        return pedidoService.updatePedido(id, pedidoDTO);
     }
 }
