@@ -90,6 +90,7 @@ public class ProductoController {
         ProductoResponseDTO updatedProducto = productoService.updateProducto(id, productoUpdateDTO);
         return new ResponseEntity<>(updatedProducto, HttpStatus.OK);
     }
+
 }
     
 
