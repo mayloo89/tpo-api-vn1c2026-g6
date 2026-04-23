@@ -268,6 +268,7 @@ public class AuthenticationService {
         return AuthenticationResponseDTO.builder()
                 .mensaje("¡Bienvenido " + user.getNombre() + "!")
                 .token(jwtToken)
+                .nombre(user.getNombre())
                 .build();
     }
 }
