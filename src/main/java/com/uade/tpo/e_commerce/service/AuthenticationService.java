@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.e_commerce.dto.AuthenticationResponseDTO;
 import com.uade.tpo.e_commerce.dto.LoginRequestDTO;
 import com.uade.tpo.e_commerce.dto.RegisterRequestDTO;
 import com.uade.tpo.e_commerce.exception.EmailAlreadyExistsException;
@@ -158,6 +159,7 @@ public class AuthenticationService {
      * @throws BadCredentialsException si la contraseña proporcionada es incorrecta
      * @throws NoSuchElementException si no se encuentra el usuario después de la autenticación exitosa
      */
+/* Comentado para prueba
     public String authenticate(LoginRequestDTO request) {
         
         // ==================== PASO 1: VALIDACIÓN DE CREDENCIALES ====================
@@ -240,5 +242,33 @@ public class AuthenticationService {
         // - El servidor podrá verificar este token en futuras solicitudes sin consultar BD
         // - Solo tokens con firma válida serán aceptados (previene manipulación)
         return jwtUtil.generateToken(user.getEmail(), roles);
+    }
+*/
+    public AuthenticationResponseDTO authenticate(LoginRequestDTO request) {
+
+        // El proceso de autenticación sigue igual
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()));
+        
+        // Buscamos al usuario para obtener su nombre
+        Usuario user = usuarioRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con email: " + request.getEmail()));
+
+        // Obtenemos los roles como arriba
+        Set<String> roles = user.getAuthorities().stream()
+            .map(grantedAuthority -> grantedAuthority.getAuthority())
+            .collect(Collectors.toSet());
+        
+        // Generamos el token
+        String jwtToken = jwtUtil.generateToken(user.getEmail(), roles);
+
+        // DEVOLVEMOS EL DTO CONSTRUYÉNDOLO CON EL BUILDER
+        return AuthenticationResponseDTO.builder()
+                .mensaje("¡Bienvenido " + user.getNombre() + "!")
+                .token(jwtToken)
+                .nombre(user.getNombre())
+                .build();
     }
 }
