@@ -1,7 +1,5 @@
 package com.uade.tpo.e_commerce.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PedidoRequestDTO {
-    private Long usuarioId;
-    private List<PedidoItemRequestDTO> items;
+public class PedidoItemResponseDTO {
+    private Long productoId;
+    private String nombreProducto;
+    private Integer cantidad;
+    private Double precioUnitario;
 }
