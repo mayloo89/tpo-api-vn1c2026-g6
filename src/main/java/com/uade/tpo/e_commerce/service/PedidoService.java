@@ -1,17 +1,26 @@
 package com.uade.tpo.e_commerce.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.e_commerce.dto.PedidoItemResponseDTO;
 import com.uade.tpo.e_commerce.dto.PedidoRequestDTO;
 import com.uade.tpo.e_commerce.dto.PedidoResponseDTO;
 import com.uade.tpo.e_commerce.exception.PedidoNotFoundException;
+import com.uade.tpo.e_commerce.exception.ProductoNotFoundException;
+import com.uade.tpo.e_commerce.exception.UsuarioNotFoundException;
 import com.uade.tpo.e_commerce.model.Pedido;
+import com.uade.tpo.e_commerce.model.PedidoItem;
+import com.uade.tpo.e_commerce.model.Producto;
+import com.uade.tpo.e_commerce.model.Usuario;
+import com.uade.tpo.e_commerce.repository.ProductoRepository;
 import com.uade.tpo.e_commerce.repository.PedidoRepository;
+import com.uade.tpo.e_commerce.repository.UsuarioRepository;
 
 @Service
 @Transactional
@@ -20,6 +29,12 @@ public class PedidoService {
 
     @Autowired
     private PedidoRepository pedidoRepository;
+    
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    
+    @Autowired
+    private ProductoRepository productoRepository;
 
     /**
      * Devuelve la lista completa de pedidos.
@@ -46,16 +61,42 @@ public class PedidoService {
      * Crea un nuevo pedido.
      */
     public PedidoResponseDTO addPedido(PedidoRequestDTO pedidoDTO) {
-        if (pedidoDTO.getCantidad() == null || pedidoDTO.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
+        if (pedidoDTO.getUsuarioId() == null) {
+            throw new IllegalArgumentException("El usuarioId es obligatorio");
         }
-        if (pedidoDTO.getDescripcion() == null || pedidoDTO.getDescripcion().isBlank()) {
-            throw new IllegalArgumentException("La descripcion no puede ser vacia");
+        if (pedidoDTO.getItems() == null || pedidoDTO.getItems().isEmpty()) {
+            throw new IllegalArgumentException("El pedido debe tener al menos un item");
         }
 
+        Usuario usuario = usuarioRepository.findById(pedidoDTO.getUsuarioId())
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con id: " + pedidoDTO.getUsuarioId()));
+
         Pedido pedido = new Pedido();
-        pedido.setDescripcion(pedidoDTO.getDescripcion());
-        pedido.setCantidad(pedidoDTO.getCantidad());
+        pedido.setUsuario(usuario);
+
+        double total = 0.0;
+        List<PedidoItem> items = pedidoDTO.getItems().stream().map(itemDTO -> {
+            if (itemDTO.getCantidad() == null || itemDTO.getCantidad() <= 0) {
+                throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
+            }
+
+            Producto producto = productoRepository.findById(itemDTO.getProductoId())
+                    .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado con id: " + itemDTO.getProductoId()));
+
+            PedidoItem item = new PedidoItem();
+            item.setPedido(pedido);
+            item.setProducto(producto);
+            item.setCantidad(itemDTO.getCantidad());
+            item.setPrecioUnitario(producto.getPrecio());
+            return item;
+        }).collect(Collectors.toList());
+
+        for (PedidoItem item : items) {
+            total += item.getPrecioUnitario() * item.getCantidad();
+        }
+
+        pedido.setItems(items);
+        pedido.setTotal(total);
 
         Pedido savedPedido = pedidoRepository.save(pedido);
         return toResponse(savedPedido);
@@ -65,15 +106,39 @@ public class PedidoService {
         Pedido existingPedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado con id: " + id));
 
-        if (pedidoDTO.getCantidad() == null || pedidoDTO.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
-        }
-        if (pedidoDTO.getDescripcion() == null || pedidoDTO.getDescripcion().isBlank()) {
-            throw new IllegalArgumentException("La descripcion no puede ser vacia");
+        if (pedidoDTO.getUsuarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(pedidoDTO.getUsuarioId())
+                    .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con id: " + pedidoDTO.getUsuarioId()));
+            existingPedido.setUsuario(usuario);
         }
 
-        existingPedido.setDescripcion(pedidoDTO.getDescripcion());
-        existingPedido.setCantidad(pedidoDTO.getCantidad());
+        if (pedidoDTO.getItems() != null) {
+            existingPedido.getItems().clear();
+
+            double total = 0.0;
+            List<PedidoItem> items = pedidoDTO.getItems().stream().map(itemDTO -> {
+                if (itemDTO.getCantidad() == null || itemDTO.getCantidad() <= 0) {
+                    throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
+                }
+
+                Producto producto = productoRepository.findById(itemDTO.getProductoId())
+                        .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado con id: " + itemDTO.getProductoId()));
+
+                PedidoItem item = new PedidoItem();
+                item.setPedido(existingPedido);
+                item.setProducto(producto);
+                item.setCantidad(itemDTO.getCantidad());
+                item.setPrecioUnitario(producto.getPrecio());
+                return item;
+            }).collect(Collectors.toList());
+
+            for (PedidoItem item : items) {
+                total += item.getPrecioUnitario() * item.getCantidad();
+            }
+
+            existingPedido.getItems().addAll(items);
+            existingPedido.setTotal(total);
+        }
 
         Pedido updatedPedido = pedidoRepository.save(existingPedido);
         return toResponse(updatedPedido);
@@ -93,10 +158,18 @@ public class PedidoService {
     }
 
     private PedidoResponseDTO toResponse(Pedido pedido) {
+        List<PedidoItemResponseDTO> items = pedido.getItems().stream()
+                .map(item -> new PedidoItemResponseDTO(
+                        item.getProducto().getId(),
+                        item.getProducto().getNombre(),
+                        item.getCantidad(),
+                        item.getPrecioUnitario()))
+                .collect(Collectors.toList());
+
         return new PedidoResponseDTO(
                 pedido.getId(),
-                pedido.getDescripcion(),
-                pedido.getCantidad());
+                pedido.getUsuario().getId(),
+                pedido.getTotal(),
+                items);
     }
 }
-

@@ -1,4 +1,4 @@
-package com.uade.tpo.e_commerce3.dto;
+package com.uade.tpo.e_commerce.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoriaRequest {
-    private String nombre;
+public class PedidoItemRequestDTO {
+    private Long productoId;
+    private Integer cantidad;
 }
