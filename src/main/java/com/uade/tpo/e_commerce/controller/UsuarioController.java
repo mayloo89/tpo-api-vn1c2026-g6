@@ -1,8 +1,6 @@
 package com.uade.tpo.e_commerce.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.uade.tpo.e_commerce.dto.UsuarioRequestDTO;
 import com.uade.tpo.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.tpo.e_commerce.service.UsuarioService;
 
@@ -15,8 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import com.uade.tpo.e_commerce.model.Usuario;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -36,19 +34,18 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public UsuarioResponseDTO addUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.addUsuario(usuario);
+    public UsuarioResponseDTO addUsuario(@RequestBody UsuarioRequestDTO usuarioRequest) {
+        return usuarioService.addUsuario(usuarioRequest);
     }
 
     @PutMapping("/{id}")
-    public UsuarioResponseDTO updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return usuarioService.updateUsuario(id, usuario);
+    public UsuarioResponseDTO updateUsuario(@PathVariable Long id, @RequestBody UsuarioRequestDTO usuarioRequest) {
+        return usuarioService.updateUsuario(id, usuarioRequest);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUsuario(@PathVariable Long id) {
         usuarioService.deleteUsuario(id);
     }
-    
     
 }
