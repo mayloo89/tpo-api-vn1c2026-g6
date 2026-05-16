@@ -8,12 +8,17 @@ import Video from './ejemplos/Video.jsx'
 import OnOff from './ejemplos/OnOff.jsx'
 import Card from './ejemplos/Card.jsx'
 import ProductList from './components/ProductList.jsx'
+import UserList from './components/UserManagement.jsx'
+import UserManagement from './components/UserManagement.jsx'
+import ProductManagement from './components/ProductManagement.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <p>hola mundo</p> */}
     {/* <ProductCard /> */}
-    <ProductList />
+    {/* <ProductList /> */}
+    <UserManagement/>
+    <ProductManagement />
     {/* <TwitterCard userName='jperez' initialIsFollowing={false} >
       @ssanchez
     </TwitterCard> */}

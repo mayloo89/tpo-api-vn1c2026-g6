@@ -1,0 +1,259 @@
+.product-management {
+  background: #333;
+  border: 1px solid #d9d9d9;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 2rem auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.product-management__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.product-management__header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #fff;
+}
+
+.product-management__btn-add {
+  border: none;
+  background: #28a745;
+  color: white;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.2s ease-in-out;
+}
+
+.product-management__btn-add:hover {
+  background: #218838;
+}
+
+.product-management__message {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.product-management__message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.product-management__message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.product-management__form {
+  background: #f9f9f9;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.product-management__form h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.product-management__form label {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.product-management__form input,
+.product-management__form textarea {
+  border: 1px solid #c8c8c8;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.product-management__form input:focus,
+.product-management__form textarea:focus {
+  outline: none;
+  border-color: #6259f9;
+  box-shadow: 0 0 0 3px rgba(98, 89, 249, 0.1);
+}
+
+.product-management__form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .product-management__form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.product-management__form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.product-management__form-actions button {
+  border: none;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.product-management__form-actions button[type="submit"] {
+  background: #6259f9;
+  color: white;
+}
+
+.product-management__form-actions button[type="submit"]:hover:not(:disabled) {
+  background: #5047d8;
+}
+
+.product-management__form-actions button[type="button"] {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.product-management__form-actions button[type="button"]:hover {
+  background: #dee2e6;
+}
+
+.product-management__form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.product-management__table-container {
+  overflow-x: auto;
+}
+
+.product-management__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.product-management__table thead {
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.product-management__table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.product-management__table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  color: #333;
+}
+
+.product-management__table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.product-management__desc {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-management__no-data {
+  text-align: center;
+  padding: 2rem 1rem !important;
+  color: #999;
+  font-size: 0.95rem;
+}
+
+.product-management__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.product-management__btn-edit,
+.product-management__btn-delete {
+  border: none;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.product-management__btn-edit {
+  background: #007bff;
+  color: white;
+}
+
+.product-management__btn-edit:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.product-management__btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.product-management__btn-delete:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.product-management__btn-edit:disabled,
+.product-management__btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .product-management {
+    padding: 1rem;
+  }
+
+  .product-management__table {
+    font-size: 0.85rem;
+  }
+
+  .product-management__table th,
+  .product-management__table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .product-management__desc {
+    max-width: 100px;
+  }
+}
