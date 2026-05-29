@@ -11,12 +11,16 @@ import ProductList from './components/ProductList.jsx'
 import UserList from './components/UserManagement.jsx'
 import UserManagement from './components/UserManagement.jsx'
 import ProductManagement from './components/ProductManagement.jsx'
+import Navbar from './components/Navbar.jsx'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <p>hola mundo</p> */}
     {/* <ProductCard /> */}
     {/* <ProductList /> */}
+
+ 
     <UserManagement/>
     <ProductManagement />
     {/* <TwitterCard userName='jperez' initialIsFollowing={false} >
