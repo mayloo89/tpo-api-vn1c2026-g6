@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UserManagement.css';
 
 const initialRegister = {
@@ -14,10 +15,12 @@ const initialLogin = {
 };
 
 const UserManagement = () => {
-  const [mode, setMode] = useState('login');
+  const navigate = useNavigate();
+  const savedUser = JSON.parse(localStorage.getItem('user') || 'null');
+  const [mode, setMode] = useState(savedUser ? 'profile' : 'login');
   const [registerData, setRegisterData] = useState(initialRegister);
   const [loginData, setLoginData] = useState(initialLogin);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(savedUser);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -78,9 +81,10 @@ const UserManagement = () => {
       const data = await response.json();
       setUser({ nombre: data.nombre || loginData.email, email: loginData.email, token: data.token });
       localStorage.setItem('user', JSON.stringify({ nombre: data.nombre || loginData.email, email: loginData.email, token: data.token }));
-      setMessage(`Bienvenido ${data.nombre || loginData.email}`);
-      setLoginData(initialLogin);
-      setMode('profile');
+    setMessage(`Bienvenido ${data.nombre || loginData.email}`);
+    setLoginData(initialLogin);
+    setMode('profile');
+    navigate('/auth');
     } catch (err) {
       setMessage(`Login fallido: ${err.message}`);
     } finally {
