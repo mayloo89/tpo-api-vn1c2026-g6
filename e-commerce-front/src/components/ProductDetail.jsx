@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useFavorites } from '../context/FavoriteContext.jsx';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
 const { id } = useParams();
 const navigate = useNavigate();
+const { addToFavorite, removeFromFavorite, isFavorite } = useFavorites();
 const [product, setProduct] = useState(null);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
@@ -30,6 +32,17 @@ if (loading) return <div className="product-detail__loading">Cargando producto..
 if (error) return <div className="product-detail__error">Error: {error}</div>;
 if (!product) return <div className="product-detail__error">Producto no encontrado</div>;
 
+const productId = product.id ?? product._id ?? product.codigo;
+const favorite = isFavorite(productId);
+const handleFavoriteClick = () => {
+if (favorite) {
+removeFromFavorite(productId);
+return;
+}
+
+addToFavorite(product);
+};
+
 return (
 <div className="product-detail">
 <button className="product-detail__back" onClick={() => navigate(-1)}>
@@ -50,6 +63,9 @@ className="product-detail__image"
 <p className="product-detail__price">
 ${Number(product.precio).toLocaleString('es-AR')}
 </p>
+<button type="button" className={favorite ? 'product-detail__favorite is-favorite' : 'product-detail__favorite'} onClick={handleFavoriteClick}>
+{favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+</button>
 <span className={`product-detail__stock ${product.stock > 0 ? 'en-stock' : 'sin-stock'}`}>
 {product.stock > 0 ? `Stock disponible: ${product.stock}` : 'Agotado'}
 </span>
