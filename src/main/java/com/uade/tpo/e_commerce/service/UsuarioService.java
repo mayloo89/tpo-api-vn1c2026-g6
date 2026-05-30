@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.e_commerce.dto.UsuarioRequestDTO;
 import com.uade.tpo.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.tpo.e_commerce.exception.UsuarioNotFoundException;
 import com.uade.tpo.e_commerce.model.Role;
@@ -37,29 +38,31 @@ public class UsuarioService {
         return toResponse(usuario);
     }
 
-    public UsuarioResponseDTO addUsuario(Usuario usuario) {
-        if (usuario.getRole() == null) {
-            usuario.setRole(Role.USER);
-        }
-        if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        }
+    public UsuarioResponseDTO addUsuario(UsuarioRequestDTO usuarioRequest) {
+        Usuario usuario = Usuario.builder()
+                .nombre(usuarioRequest.getNombre())
+                .apellido(usuarioRequest.getApellido())
+                .email(usuarioRequest.getEmail())
+                .password(passwordEncoder.encode(usuarioRequest.getPassword()))
+                .role(usuarioRequest.getRole() != null ? Role.valueOf(usuarioRequest.getRole()) : Role.USER)
+                .build();
+        
         Usuario saved = usuarioRepository.save(usuario);
         return toResponse(saved);
     }
 
-    public UsuarioResponseDTO updateUsuario(Long id, Usuario usuario) {
+    public UsuarioResponseDTO updateUsuario(Long id, UsuarioRequestDTO usuarioRequest) {
         Usuario existing = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con id: " + id));
 
-        existing.setNombre(usuario.getNombre());
-        existing.setApellido(usuario.getApellido());
-        existing.setEmail(usuario.getEmail());
-        if (usuario.getRole() != null) {
-            existing.setRole(usuario.getRole());
+        existing.setNombre(usuarioRequest.getNombre());
+        existing.setApellido(usuarioRequest.getApellido());
+        existing.setEmail(usuarioRequest.getEmail());
+        if (usuarioRequest.getRole() != null && !usuarioRequest.getRole().isBlank()) {
+            existing.setRole(Role.valueOf(usuarioRequest.getRole()));
         }
-        if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
-            existing.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        if (usuarioRequest.getPassword() != null && !usuarioRequest.getPassword().isBlank()) {
+            existing.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
         }
 
         Usuario updated = usuarioRepository.save(existing);
