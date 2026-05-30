@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import CardProductos from './CardProductos.jsx';
-import './ProductList.css';
+import React, { useEffect, useState } from 'react'
+import CardProductos from './CardProductos.jsx'
+import './ProductList.css'
 
 const ProductList = () => {
-const [products, setProducts] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
+const [products, setProducts] = useState([])
+const [loading, setLoading] = useState(true)
+const [error, setError] = useState(null)
 
 useEffect(() => {
 const fetchProducts = async () => {
@@ -32,7 +31,7 @@ if (error) return <div className="product-list-container"><p>Error: {error}</p><
 
 const items = Array.isArray(products)
 ? products
-: products?.productos || products?.data || products?.items || [];
+: products?.productos || products?.data || products?.items || []
 
 return (
 <div className="product-list-container">
@@ -40,20 +39,14 @@ return (
 <div className="products-grid">
 {items.length === 0 && <div>No hay productos.</div>}
 {items.map(product => {
-const id = product.id ?? product._id ?? product.codigo;
+const id = product.id ?? product._id ?? product.codigo
 return (
-<Link
-to={`/products/${id}`}
-key={id}
-style={{ textDecoration: 'none', color: 'inherit' }}
->
-<CardProductos product={product} />
-</Link>
-);
+<CardProductos key={id} product={{ ...product, id }} />
+)
 })}
 </div>
 </div>
-);
-};
+)
+}
 
-export default ProductList;
+export default ProductList
