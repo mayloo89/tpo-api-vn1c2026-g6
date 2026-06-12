@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import CardProductos from './CardProductos.jsx'
+import { apiRequest } from '../services/apiClient.js'
 import './ProductList.css'
 
 const ProductList = () => {
@@ -10,11 +11,7 @@ const [error, setError] = useState(null)
 useEffect(() => {
 const fetchProducts = async () => {
 try {
-const response = await fetch('http://localhost:8080/api/productos');
-if (!response.ok) {
-throw new Error('Error al cargar los productos');
-}
-const data = await response.json();
+const data = await apiRequest('/api/productos');
 setProducts(data);
 } catch (err) {
 setError(err.message);

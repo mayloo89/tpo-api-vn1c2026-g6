@@ -1,41 +1,45 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
-import { useFavorites } from '../context/FavoriteContext.jsx'
-import { useCart } from '../context/CartContext.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToCart, selectIsInCart } from '../store/cartSlice.js'
+import { addToFavorite, removeFromFavorite, selectIsFavorite } from '../store/favoritesSlice.js'
 import './CardProductos.css'
 
 const CardProductos = ({ product }) => {
-  const { addToFavorite, removeFromFavorite, isFavorite } = useFavorites()
-  const { addToCart, isInCart } = useCart()
+  const dispatch = useDispatch()
   const productId = product.id ?? product._id ?? product.codigo
-  const favorite = isFavorite(productId)
+  const favorite = useSelector(state => selectIsFavorite(state, productId))
+  const inCart = useSelector(state => selectIsInCart(state, productId))
 
   const handleFavoriteClick = event => {
     event.preventDefault()
     event.stopPropagation()
 
     if (favorite) {
-      removeFromFavorite(productId)
+      dispatch(removeFromFavorite(productId))
       return
     }
 
-    addToFavorite(product)
+    dispatch(addToFavorite(product))
   }
 
   const handleAddToCart = event => {
     event.preventDefault()
     event.stopPropagation()
-    addToCart(product)
+    dispatch(addToCart({ product }))
   }
 
   return (
     <article className="card-producto">
       <div className="producto-imagen-container">
-        <img
-          src={product.imagen}
-          alt={product.nombre}
-          className="producto-imagen"
-        />
+        {product.imagen ? (
+          <img
+            src={product.imagen}
+            alt={product.nombre}
+            className="producto-imagen"
+          />
+        ) : (
+          <div className="producto-imagen producto-imagen--placeholder">Sin imagen</div>
+        )}
         <button
           type="button"
           className={favorite ? 'producto-favorite is-favorite' : 'producto-favorite'}
@@ -44,7 +48,7 @@ const CardProductos = ({ product }) => {
         >
           {favorite ? '♥' : '♡'}
         </button>
-        <span className="producto-categoria">{product.categoria}</span>
+        {product.categoria ? <span className="producto-categoria">{product.categoria}</span> : null}
       </div>
 
       <div className="producto-info">
@@ -54,9 +58,11 @@ const CardProductos = ({ product }) => {
         </div>
         <p className="producto-descripcion">{product.descripcion}</p>
 
-        <div className="producto-rating">
-          <span className="stars">⭐ {product.rating}</span>
-        </div>
+        {product.rating ? (
+          <div className="producto-rating">
+            <span className="stars">⭐ {product.rating}</span>
+          </div>
+        ) : null}
 
   <div className="producto-footer">
   <span className={product.stock > 0 ? 'en-stock' : 'sin-stock'}>
@@ -65,10 +71,10 @@ const CardProductos = ({ product }) => {
   <div className="producto-footer__actions">
     <button
       type="button"
-      className={isInCart(productId) ? 'btn-carrito in-cart' : 'btn-carrito'}
+      className={inCart ? 'btn-carrito in-cart' : 'btn-carrito'}
       onClick={handleAddToCart}
     >
-      {isInCart(productId) ? 'En carrito' : 'Carrito'}
+      {inCart ? 'En carrito' : 'Carrito'}
     </button>
     <Link to={`/products/${productId}`} className="btn-agregar">
       Ver detalle

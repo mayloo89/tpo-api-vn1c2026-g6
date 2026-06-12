@@ -1,9 +1,20 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  clearCart,
+  removeFromCart,
+  selectCartCount,
+  selectCartItems,
+  selectCartTotal,
+  updateQuantity,
+} from '../store/cartSlice.js'
 import './Cart.css'
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart()
+  const dispatch = useDispatch()
+  const cartItems = useSelector(selectCartItems)
+  const cartTotal = useSelector(selectCartTotal)
+  const cartCount = useSelector(selectCartCount)
 
   return (
     <section className="cart-page">
@@ -31,27 +42,33 @@ const Cart = () => {
 
               return (
                 <article key={productId} className="cart-card">
-                  <img
-                    src={product.imagen}
-                    alt={product.nombre}
-                    className="cart-card__image"
-                  />
+                  {product.imagen ? (
+                    <img
+                      src={product.imagen}
+                      alt={product.nombre}
+                      className="cart-card__image"
+                    />
+                  ) : (
+                    <div className="cart-card__image cart-card__image--placeholder">
+                      Sin imagen
+                    </div>
+                  )}
                   <div className="cart-card__body">
                     <div className="cart-card__top">
                       <div>
                         <h2 className="cart-card__title">{product.nombre}</h2>
-                        <p className="cart-card__category">{product.categoria}</p>
+                        {product.categoria ? <p className="cart-card__category">{product.categoria}</p> : null}
                       </div>
                       <span className="cart-card__price">
                         ${Number(product.precio).toLocaleString('es-AR')}
                       </span>
                     </div>
-                    <p className="cart-card__description">{product.descripcion}</p>
+                    {product.descripcion ? <p className="cart-card__description">{product.descripcion}</p> : null}
                     <div className="cart-card__quantity">
                       <button
                         type="button"
                         className="cart-card__qty-btn"
-                        onClick={() => updateQuantity(productId, product.quantity - 1)}
+                        onClick={() => dispatch(updateQuantity({ productId, quantity: product.quantity - 1 }))}
                       >
                         −
                       </button>
@@ -59,7 +76,7 @@ const Cart = () => {
                       <button
                         type="button"
                         className="cart-card__qty-btn"
-                        onClick={() => updateQuantity(productId, product.quantity + 1)}
+                        onClick={() => dispatch(updateQuantity({ productId, quantity: product.quantity + 1 }))}
                       >
                         +
                       </button>
@@ -74,7 +91,7 @@ const Cart = () => {
                       <button
                         type="button"
                         className="cart-card__button cart-card__button--danger"
-                        onClick={() => removeFromCart(productId)}
+                        onClick={() => dispatch(removeFromCart(productId))}
                       >
                         Quitar
                       </button>
@@ -94,7 +111,7 @@ const Cart = () => {
               <button
                 type="button"
                 className="cart-page__button cart-page__button--clear"
-                onClick={clearCart}
+                onClick={() => dispatch(clearCart())}
               >
                 Vaciar carrito
               </button>

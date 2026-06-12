@@ -1,9 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { selectIsLoggedIn } from '../store/authSlice.js'
 
 const ProtectedRoute = () => {
-    const user = JSON.parse(localStorage.getItem('user') || 'null')
+    const isLoggedIn = useSelector(selectIsLoggedIn)
 
-    if (!user) {
+    if (!isLoggedIn) {
         return <Navigate to="/auth" replace />
     }
 

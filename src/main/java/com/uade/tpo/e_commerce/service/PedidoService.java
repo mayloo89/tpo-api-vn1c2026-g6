@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.e_commerce.dto.PedidoItemResponseDTO;
@@ -15,6 +14,7 @@ import com.uade.tpo.e_commerce.exception.PedidoNotFoundException;
 import com.uade.tpo.e_commerce.exception.ProductoNotFoundException;
 import com.uade.tpo.e_commerce.exception.UsuarioNotFoundException;
 import com.uade.tpo.e_commerce.model.Pedido;
+import com.uade.tpo.e_commerce.model.PedidoEstado;
 import com.uade.tpo.e_commerce.model.PedidoItem;
 import com.uade.tpo.e_commerce.model.Producto;
 import com.uade.tpo.e_commerce.model.Usuario;
@@ -27,14 +27,16 @@ import com.uade.tpo.e_commerce.repository.UsuarioRepository;
 
 public class PedidoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
-    
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    
-    @Autowired
-    private ProductoRepository productoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final ProductoRepository productoRepository;
+
+    public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository,
+            ProductoRepository productoRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.productoRepository = productoRepository;
+    }
 
     /**
      * Devuelve la lista completa de pedidos.
@@ -73,6 +75,7 @@ public class PedidoService {
 
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
+        pedido.setEstado(PedidoEstado.CONFIRMADO);
 
         double total = 0.0;
         List<PedidoItem> items = pedidoDTO.getItems().stream().map(itemDTO -> {
@@ -169,6 +172,7 @@ public class PedidoService {
         return new PedidoResponseDTO(
                 pedido.getId(),
                 pedido.getUsuario().getId(),
+            pedido.getEstado() != null ? pedido.getEstado().name() : PedidoEstado.CONFIRMADO.name(),
                 pedido.getTotal(),
                 items);
     }

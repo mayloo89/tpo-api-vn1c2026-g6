@@ -1,13 +1,15 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useFavorites } from '../context/FavoriteContext.jsx'
-import { useCart } from '../context/CartContext.jsx'
+import { useSelector } from 'react-redux'
+import { selectCartCount } from '../store/cartSlice.js'
+import { selectFavoriteItems } from '../store/favoritesSlice.js'
+import { selectUser } from '../store/authSlice.js'
 import '../styles/Navbar.css'
 
 function Navbar() {
   const location = useLocation()
-  const { favoriteItems } = useFavorites()
-  const { cartCount } = useCart()
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const favoriteItems = useSelector(selectFavoriteItems)
+  const cartCount = useSelector(selectCartCount)
+  const user = useSelector(selectUser)
 
 const isActive = (path) => {
 if (path === '/products') return location.pathname.startsWith('/products')

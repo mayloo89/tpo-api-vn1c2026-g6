@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class PedidoResponseDTO {
     private Long id;
     private Long usuarioId;
+    private String estado;
     private Double total;
     private List<PedidoItemResponseDTO> items;
 }
