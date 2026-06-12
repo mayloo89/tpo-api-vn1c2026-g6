@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
-import { useFavorites } from '../context/FavoriteContext.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import { removeFromFavorite, selectFavoriteItems } from '../store/favoritesSlice.js'
 import './Favorite.css'
 
 const Favorite = () => {
-    const { favoriteItems, removeFromFavorite } = useFavorites()
+    const dispatch = useDispatch()
+    const favoriteItems = useSelector(selectFavoriteItems)
 
     return (
         <section className="favorite-page">
@@ -49,7 +51,7 @@ const Favorite = () => {
                                         <button
                                             type="button"
                                             className="favorite-card__button favorite-card__button--danger"
-                                            onClick={() => removeFromFavorite(productId)}
+                                            onClick={() => dispatch(removeFromFavorite(productId))}
                                         >
                                             Quitar
                                         </button>

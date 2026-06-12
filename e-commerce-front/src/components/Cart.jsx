@@ -1,9 +1,20 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  clearCart,
+  removeFromCart,
+  selectCartCount,
+  selectCartItems,
+  selectCartTotal,
+  updateQuantity,
+} from '../store/cartSlice.js'
 import './Cart.css'
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart()
+  const dispatch = useDispatch()
+  const cartItems = useSelector(selectCartItems)
+  const cartTotal = useSelector(selectCartTotal)
+  const cartCount = useSelector(selectCartCount)
 
   return (
     <section className="cart-page">
@@ -51,7 +62,7 @@ const Cart = () => {
                       <button
                         type="button"
                         className="cart-card__qty-btn"
-                        onClick={() => updateQuantity(productId, product.quantity - 1)}
+                        onClick={() => dispatch(updateQuantity({ productId, quantity: product.quantity - 1 }))}
                       >
                         −
                       </button>
@@ -59,7 +70,7 @@ const Cart = () => {
                       <button
                         type="button"
                         className="cart-card__qty-btn"
-                        onClick={() => updateQuantity(productId, product.quantity + 1)}
+                        onClick={() => dispatch(updateQuantity({ productId, quantity: product.quantity + 1 }))}
                       >
                         +
                       </button>
@@ -74,7 +85,7 @@ const Cart = () => {
                       <button
                         type="button"
                         className="cart-card__button cart-card__button--danger"
-                        onClick={() => removeFromCart(productId)}
+                        onClick={() => dispatch(removeFromCart(productId))}
                       >
                         Quitar
                       </button>
@@ -94,7 +105,7 @@ const Cart = () => {
               <button
                 type="button"
                 className="cart-page__button cart-page__button--clear"
-                onClick={clearCart}
+                onClick={() => dispatch(clearCart())}
               >
                 Vaciar carrito
               </button>
