@@ -1,0 +1,115 @@
+import { Link } from 'react-router-dom'
+import { useCart } from '../context/CartContext.jsx'
+import './Cart.css'
+
+const Cart = () => {
+  const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart()
+
+  return (
+    <section className="cart-page">
+      <header className="cart-page__header">
+        <h1 className="cart-page__title">Carrito</h1>
+        <p className="cart-page__subtitle">
+          {cartCount > 0
+            ? `${cartCount} producto${cartCount !== 1 ? 's' : ''} — Total: $${cartTotal.toLocaleString('es-AR')}`
+            : 'Tu carrito está vacío'}
+        </p>
+      </header>
+
+      {cartItems.length === 0 ? (
+        <div className="cart-page__empty">
+          <p>No tenés productos en el carrito.</p>
+          <Link to="/products" className="cart-page__link">
+            Explorar productos
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="cart-page__grid">
+            {cartItems.map(product => {
+              const productId = product.id ?? product._id ?? product.codigo
+
+              return (
+                <article key={productId} className="cart-card">
+                  <img
+                    src={product.imagen}
+                    alt={product.nombre}
+                    className="cart-card__image"
+                  />
+                  <div className="cart-card__body">
+                    <div className="cart-card__top">
+                      <div>
+                        <h2 className="cart-card__title">{product.nombre}</h2>
+                        <p className="cart-card__category">{product.categoria}</p>
+                      </div>
+                      <span className="cart-card__price">
+                        ${Number(product.precio).toLocaleString('es-AR')}
+                      </span>
+                    </div>
+                    <p className="cart-card__description">{product.descripcion}</p>
+                    <div className="cart-card__quantity">
+                      <button
+                        type="button"
+                        className="cart-card__qty-btn"
+                        onClick={() => updateQuantity(productId, product.quantity - 1)}
+                      >
+                        −
+                      </button>
+                      <span className="cart-card__qty-value">{product.quantity}</span>
+                      <button
+                        type="button"
+                        className="cart-card__qty-btn"
+                        onClick={() => updateQuantity(productId, product.quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="cart-card__actions">
+                      <Link
+                        to={`/products/${productId}`}
+                        className="cart-card__button cart-card__button--secondary"
+                      >
+                        Ver detalle
+                      </Link>
+                      <button
+                        type="button"
+                        className="cart-card__button cart-card__button--danger"
+                        onClick={() => removeFromCart(productId)}
+                      >
+                        Quitar
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+
+          <footer className="cart-page__footer">
+            <div className="cart-page__total">
+              <span>Total:</span>
+              <span>${cartTotal.toLocaleString('es-AR')}</span>
+            </div>
+            <div className="cart-page__footer-actions">
+              <button
+                type="button"
+                className="cart-page__button cart-page__button--clear"
+                onClick={clearCart}
+              >
+                Vaciar carrito
+              </button>
+              <button
+                type="button"
+                className="cart-page__button cart-page__button--checkout"
+              >
+                Finalizar compra
+              </button>
+            </div>
+          </footer>
+        </>
+      )}
+    </section>
+  )
+}
+
+export default Cart

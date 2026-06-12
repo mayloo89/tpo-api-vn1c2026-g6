@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useFavorites } from '../context/FavoriteContext.jsx'
+import { useCart } from '../context/CartContext.jsx'
 import '../styles/Navbar.css'
 
 function Navbar() {
-const location = useLocation()
-const { favoriteItems } = useFavorites()
-const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const location = useLocation()
+  const { favoriteItems } = useFavorites()
+  const { cartCount } = useCart()
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
 
 const isActive = (path) => {
 if (path === '/products') return location.pathname.startsWith('/products')
@@ -30,11 +32,16 @@ Inicio
 Productos
 </Link>
 </li>
-<li>
-<Link to="/favorites" className={isActive('/favorites') ? 'nav-link active' : 'nav-link'}>
-Favoritos {favoriteItems.length > 0 ? `(${favoriteItems.length})` : ''}
-</Link>
-</li>
+        <li>
+          <Link to="/favorites" className={isActive('/favorites') ? 'nav-link active' : 'nav-link'}>
+            Favoritos {favoriteItems.length > 0 ? `(${favoriteItems.length})` : ''}
+          </Link>
+        </li>
+        <li>
+          <Link to="/cart" className={isActive('/cart') ? 'nav-link active' : 'nav-link'}>
+            Carrito {cartCount > 0 ? `(${cartCount})` : ''}
+          </Link>
+        </li>
 {user ? (
 <li>
 <Link to="/admin/products" className={isActive('/admin/products') ? 'nav-link active' : 'nav-link'}>
