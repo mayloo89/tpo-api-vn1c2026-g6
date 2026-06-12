@@ -42,22 +42,28 @@ const Cart = () => {
 
               return (
                 <article key={productId} className="cart-card">
-                  <img
-                    src={product.imagen}
-                    alt={product.nombre}
-                    className="cart-card__image"
-                  />
+                  {product.imagen ? (
+                    <img
+                      src={product.imagen}
+                      alt={product.nombre}
+                      className="cart-card__image"
+                    />
+                  ) : (
+                    <div className="cart-card__image cart-card__image--placeholder">
+                      Sin imagen
+                    </div>
+                  )}
                   <div className="cart-card__body">
                     <div className="cart-card__top">
                       <div>
                         <h2 className="cart-card__title">{product.nombre}</h2>
-                        <p className="cart-card__category">{product.categoria}</p>
+                        {product.categoria ? <p className="cart-card__category">{product.categoria}</p> : null}
                       </div>
                       <span className="cart-card__price">
                         ${Number(product.precio).toLocaleString('es-AR')}
                       </span>
                     </div>
-                    <p className="cart-card__description">{product.descripcion}</p>
+                    {product.descripcion ? <p className="cart-card__description">{product.descripcion}</p> : null}
                     <div className="cart-card__quantity">
                       <button
                         type="button"

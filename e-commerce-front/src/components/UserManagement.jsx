@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { loadCart, resetCart } from '../store/cartSlice.js';
+import { loadFavorites, resetFavorites } from '../store/favoritesSlice.js';
+import { getStoredUser } from '../services/apiClient.js';
 import './UserManagement.css';
 
 const initialRegister = {
@@ -15,6 +19,7 @@ const initialLogin = {
 };
 
 const UserManagement = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const savedUser = JSON.parse(localStorage.getItem('user') || 'null');
   const [mode, setMode] = useState(savedUser ? 'profile' : 'login');
@@ -23,6 +28,15 @@ const UserManagement = () => {
   const [user, setUser] = useState(savedUser);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const user = getStoredUser();
+
+    if (user?.token) {
+      dispatch(loadCart());
+      dispatch(loadFavorites());
+    }
+  }, [dispatch]);
 
   const resetMessage = () => setMessage('');
 
@@ -79,12 +93,15 @@ const UserManagement = () => {
       }
 
       const data = await response.json();
-      setUser({ nombre: data.nombre || loginData.email, email: loginData.email, token: data.token });
-      localStorage.setItem('user', JSON.stringify({ nombre: data.nombre || loginData.email, email: loginData.email, token: data.token }));
-    setMessage(`Bienvenido ${data.nombre || loginData.email}`);
-    setLoginData(initialLogin);
-    setMode('profile');
-    navigate('/auth');
+      const currentUser = { nombre: data.nombre || loginData.email, email: loginData.email, token: data.token };
+      setUser(currentUser);
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      dispatch(loadCart());
+      dispatch(loadFavorites());
+      setMessage(`Bienvenido ${data.nombre || loginData.email}`);
+      setLoginData(initialLogin);
+      setMode('profile');
+      navigate('/auth');
     } catch (err) {
       setMessage(`Login fallido: ${err.message}`);
     } finally {
@@ -95,6 +112,8 @@ const UserManagement = () => {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    dispatch(resetCart());
+    dispatch(resetFavorites());
     setMode('login');
     setMessage('Sesión cerrada.');
   };

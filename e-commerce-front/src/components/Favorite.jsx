@@ -30,16 +30,24 @@ const Favorite = () => {
 
                         return (
                             <article key={productId} className="favorite-card">
-                                <img
-                                    src={product.imagen}
-                                    alt={product.nombre}
-                                    className="favorite-card__image"
-                                />
+                                {product.imagen ? (
+                                    <img
+                                        src={product.imagen}
+                                        alt={product.nombre}
+                                        className="favorite-card__image"
+                                    />
+                                ) : (
+                                    <div className="favorite-card__image favorite-card__image--placeholder">
+                                        Sin imagen
+                                    </div>
+                                )}
                                 <div className="favorite-card__body">
                                     <div className="favorite-card__top">
                                         <div>
                                             <h2 className="favorite-card__title">{product.nombre}</h2>
-                                            <p className="favorite-card__category">{product.categoria}</p>
+                                            {product.categoria ? (
+                                                <p className="favorite-card__category">{product.categoria}</p>
+                                            ) : null}
                                         </div>
                                         <span className="favorite-card__price">${Number(product.precio).toLocaleString('es-AR')}</span>
                                     </div>

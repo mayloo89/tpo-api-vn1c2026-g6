@@ -13,11 +13,13 @@ import Favorite from './components/Favorite.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Cart from './components/Cart.jsx'
 import store from './store/store.js'
+import SessionBootstrap from './store/sessionBootstrap.js'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <Provider store={store}>
             <BrowserRouter>
+                <SessionBootstrap />
                 <Navbar />
                 <Routes>
                     <Route path="/" element={<Home />} />

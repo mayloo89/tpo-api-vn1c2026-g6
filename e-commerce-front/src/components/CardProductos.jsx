@@ -31,11 +31,15 @@ const CardProductos = ({ product }) => {
   return (
     <article className="card-producto">
       <div className="producto-imagen-container">
-        <img
-          src={product.imagen}
-          alt={product.nombre}
-          className="producto-imagen"
-        />
+        {product.imagen ? (
+          <img
+            src={product.imagen}
+            alt={product.nombre}
+            className="producto-imagen"
+          />
+        ) : (
+          <div className="producto-imagen producto-imagen--placeholder">Sin imagen</div>
+        )}
         <button
           type="button"
           className={favorite ? 'producto-favorite is-favorite' : 'producto-favorite'}
@@ -44,7 +48,7 @@ const CardProductos = ({ product }) => {
         >
           {favorite ? '♥' : '♡'}
         </button>
-        <span className="producto-categoria">{product.categoria}</span>
+        {product.categoria ? <span className="producto-categoria">{product.categoria}</span> : null}
       </div>
 
       <div className="producto-info">
@@ -54,9 +58,11 @@ const CardProductos = ({ product }) => {
         </div>
         <p className="producto-descripcion">{product.descripcion}</p>
 
-        <div className="producto-rating">
-          <span className="stars">⭐ {product.rating}</span>
-        </div>
+        {product.rating ? (
+          <div className="producto-rating">
+            <span className="stars">⭐ {product.rating}</span>
+          </div>
+        ) : null}
 
   <div className="producto-footer">
   <span className={product.stock > 0 ? 'en-stock' : 'sin-stock'}>

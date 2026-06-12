@@ -9,11 +9,4 @@ const store = configureStore({
   },
 })
 
-store.subscribe(() => {
-  const state = store.getState()
-
-  localStorage.setItem('cartItems', JSON.stringify(state.cart.items))
-  localStorage.setItem('favoriteItems', JSON.stringify(state.favorites.items))
-})
-
 export default store

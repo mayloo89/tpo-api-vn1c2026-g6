@@ -1,43 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { getProductId, normalizeProduct } from './productHelpers.js'
-
-const storageKey = 'favoriteItems'
-
-const loadFavoriteItems = () => {
-  try {
-    const storedItems = JSON.parse(localStorage.getItem(storageKey) || '[]')
-    return Array.isArray(storedItems) ? storedItems : []
-  } catch {
-    return []
-  }
-}
+import { apiRequest, getStoredUser } from '../services/apiClient.js'
 
 const initialState = {
-  items: loadFavoriteItems(),
+  items: [],
 }
+
+export const loadFavorites = createAsyncThunk('favorites/loadFavorites', async () => {
+  const user = getStoredUser()
+
+  if (!user?.token) {
+    return []
+  }
+
+  const response = await apiRequest('/api/favoritos')
+  return Array.isArray(response) ? response.map(normalizeProduct) : []
+})
+
+export const addToFavorite = createAsyncThunk('favorites/addToFavorite', async product => {
+  const response = await apiRequest(`/api/favoritos/${getProductId(product)}`, {
+    method: 'POST',
+  })
+
+  return Array.isArray(response) ? response.map(normalizeProduct) : []
+})
+
+export const removeFromFavorite = createAsyncThunk('favorites/removeFromFavorite', async productId => {
+  const response = await apiRequest(`/api/favoritos/${productId}`, {
+    method: 'DELETE',
+  })
+
+  return Array.isArray(response) ? response.map(normalizeProduct) : []
+})
 
 const favoritesSlice = createSlice({
   name: 'favorites',
   initialState,
   reducers: {
-    addToFavorite(state, action) {
-      const normalizedProduct = normalizeProduct(action.payload)
-      const alreadyFavorite = state.items.some(
-        item => getProductId(item) === normalizedProduct.id,
-      )
-
-      if (!alreadyFavorite) {
-        state.items.push(normalizedProduct)
-      }
+    resetFavorites(state) {
+      state.items = []
     },
-    removeFromFavorite(state, action) {
-      const productId = action.payload
-      state.items = state.items.filter(item => getProductId(item) !== productId)
-    },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(loadFavorites.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
+      .addCase(addToFavorite.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
+      .addCase(removeFromFavorite.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
   },
 })
 
-export const { addToFavorite, removeFromFavorite } = favoritesSlice.actions
+export const { resetFavorites } = favoritesSlice.actions
 export default favoritesSlice.reducer
 
 export const selectFavoriteItems = state => state.favorites.items

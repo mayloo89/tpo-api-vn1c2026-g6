@@ -1,62 +1,105 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { getProductId, normalizeProduct } from './productHelpers.js'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { getProductId } from './productHelpers.js'
+import { apiRequest, getStoredUser } from '../services/apiClient.js'
 
-const storageKey = 'cartItems'
+const normalizeCartItem = item => ({
+  id: item.productoId ?? item.id,
+  nombre: item.nombreProducto ?? item.nombre,
+  descripcion: item.descripcion,
+  precio: item.precioUnitario ?? item.precio,
+  stock: item.stock,
+  quantity: item.cantidad ?? item.quantity ?? 1,
+})
 
-const loadCartItems = () => {
-  try {
-    const storedItems = JSON.parse(localStorage.getItem(storageKey) || '[]')
-    return Array.isArray(storedItems) ? storedItems : []
-  } catch {
+const normalizeCartResponse = response => {
+  if (!response) {
     return []
   }
+
+  const items = Array.isArray(response) ? response : response.items
+  return Array.isArray(items) ? items.map(normalizeCartItem) : []
 }
 
 const initialState = {
-  items: loadCartItems(),
+  items: [],
 }
+
+export const loadCart = createAsyncThunk('cart/loadCart', async () => {
+  const user = getStoredUser()
+
+  if (!user?.token) {
+    return []
+  }
+
+  const response = await apiRequest('/api/carrito')
+  return normalizeCartResponse(response)
+})
+
+export const addToCart = createAsyncThunk('cart/addToCart', async ({ product, quantity = 1 }) => {
+  const response = await apiRequest('/api/carrito/items', {
+    method: 'POST',
+    body: JSON.stringify({ productoId: getProductId(product), cantidad: quantity }),
+  })
+
+  return normalizeCartResponse(response)
+})
+
+export const removeFromCart = createAsyncThunk('cart/removeFromCart', async productId => {
+  const response = await apiRequest(`/api/carrito/items/${productId}`, {
+    method: 'DELETE',
+  })
+
+  return normalizeCartResponse(response)
+})
+
+export const updateQuantity = createAsyncThunk(
+  'cart/updateQuantity',
+  async ({ productId, quantity }) => {
+    const response = await apiRequest(`/api/carrito/items/${productId}?cantidad=${quantity}`, {
+      method: 'PUT',
+    })
+
+    return normalizeCartResponse(response)
+  },
+)
+
+export const clearCart = createAsyncThunk('cart/clearCart', async () => {
+  await apiRequest('/api/carrito/clear', {
+    method: 'DELETE',
+  })
+
+  return []
+})
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addToCart(state, action) {
-      const { product, quantity = 1 } = action.payload
-      const normalizedProduct = { ...normalizeProduct(product), quantity }
-      const existingIndex = state.items.findIndex(
-        item => getProductId(item) === normalizedProduct.id,
-      )
-
-      if (existingIndex >= 0) {
-        state.items[existingIndex].quantity += quantity
-        return
-      }
-
-      state.items.push(normalizedProduct)
-    },
-    removeFromCart(state, action) {
-      const productId = action.payload
-      state.items = state.items.filter(item => getProductId(item) !== productId)
-    },
-    updateQuantity(state, action) {
-      const { productId, quantity } = action.payload
-
-      if (quantity < 1) {
-        state.items = state.items.filter(item => getProductId(item) !== productId)
-        return
-      }
-
-      state.items = state.items.map(item =>
-        getProductId(item) === productId ? { ...item, quantity } : item,
-      )
-    },
-    clearCart(state) {
+    resetCart(state) {
       state.items = []
     },
   },
+  extraReducers: builder => {
+    builder
+      .addCase(loadCart.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
+      .addCase(removeFromCart.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
+      .addCase(updateQuantity.fulfilled, (state, action) => {
+        state.items = action.payload
+      })
+      .addCase(clearCart.fulfilled, state => {
+        state.items = []
+      })
+  },
 })
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions
+export const { resetCart } = cartSlice.actions
 export default cartSlice.reducer
 
 export const selectCartItems = state => state.cart.items
