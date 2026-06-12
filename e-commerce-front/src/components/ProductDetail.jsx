@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, selectIsInCart } from '../store/cartSlice.js';
 import { addToFavorite, removeFromFavorite, selectIsFavorite } from '../store/favoritesSlice.js';
+import { apiRequest } from '../services/apiClient.js';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -20,9 +21,7 @@ const inCart = useSelector(state => selectIsInCart(state, productId));
 useEffect(() => {
 const fetchProduct = async () => {
 try {
-const response = await fetch(`http://localhost:8080/api/productos/${id}`);
-if (!response.ok) throw new Error('Producto no encontrado');
-const data = await response.json();
+const data = await apiRequest(`/api/productos/${id}`);
 setProduct(data);
 } catch (err) {
 setError(err.message);

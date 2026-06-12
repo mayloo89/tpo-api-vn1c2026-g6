@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loadCart, resetCart } from '../store/cartSlice.js';
 import { loadFavorites, resetFavorites } from '../store/favoritesSlice.js';
-import { getStoredUser } from '../services/apiClient.js';
+import { loginThunk, registerThunk, logout, clearAuthError, selectUser, selectAuthStatus, selectAuthError } from '../store/authSlice.js';
 import './UserManagement.css';
 
 const initialRegister = {
@@ -21,24 +21,21 @@ const initialLogin = {
 const UserManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const savedUser = JSON.parse(localStorage.getItem('user') || 'null');
-  const [mode, setMode] = useState(savedUser ? 'profile' : 'login');
+  const user = useSelector(selectUser);
+  const authStatus = useSelector(selectAuthStatus);
+  const authError = useSelector(selectAuthError);
+
+  const [mode, setMode] = useState(user ? 'profile' : 'login');
   const [registerData, setRegisterData] = useState(initialRegister);
   const [loginData, setLoginData] = useState(initialLogin);
-  const [user, setUser] = useState(savedUser);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const user = getStoredUser();
+  const loading = authStatus === 'loading';
 
-    if (user?.token) {
-      dispatch(loadCart());
-      dispatch(loadFavorites());
-    }
-  }, [dispatch]);
-
-  const resetMessage = () => setMessage('');
+  const resetMessage = () => {
+    setMessage('');
+    dispatch(clearAuthError());
+  };
 
   const handleChange = (event, formType) => {
     const { name, value } = event.target;
@@ -51,72 +48,38 @@ const UserManagement = () => {
 
   const handleRegister = async event => {
     event.preventDefault();
-    setLoading(true);
     setMessage('');
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registerData),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Error al registrar el usuario');
-      }
-
-      const text = await response.text();
-      setMessage(`Registro exitoso: ${text}`);
+    const result = await dispatch(registerThunk(registerData));
+    if (registerThunk.fulfilled.match(result)) {
+      setMessage(`Registro exitoso: ${result.payload}`);
       setRegisterData(initialRegister);
       setMode('login');
-    } catch (err) {
-      setMessage(`Registro fallido: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleLogin = async event => {
     event.preventDefault();
-    setLoading(true);
     setMessage('');
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData),
-      });
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(errorBody || 'Error en el inicio de sesión');
-      }
-
-      const data = await response.json();
-      const currentUser = { nombre: data.nombre || loginData.email, email: loginData.email, token: data.token };
-      setUser(currentUser);
-      localStorage.setItem('user', JSON.stringify(currentUser));
+    const result = await dispatch(loginThunk(loginData));
+    if (loginThunk.fulfilled.match(result)) {
       dispatch(loadCart());
       dispatch(loadFavorites());
-      setMessage(`Bienvenido ${data.nombre || loginData.email}`);
+      setMessage(`Bienvenido ${result.payload.nombre}`);
       setLoginData(initialLogin);
       setMode('profile');
       navigate('/auth');
-    } catch (err) {
-      setMessage(`Login fallido: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+    dispatch(logout());
     dispatch(resetCart());
     dispatch(resetFavorites());
     setMode('login');
     setMessage('Sesión cerrada.');
   };
+
+  const displayMessage = message || (authError ? `Error: ${authError}` : '');
 
   return (
     <section className="user-management">
@@ -135,7 +98,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {message && <div className="user-management__message">{message}</div>}
+      {displayMessage && <div className="user-management__message">{displayMessage}</div>}
 
       {mode === 'register' && (
         <form className="user-management__form" onSubmit={handleRegister}>

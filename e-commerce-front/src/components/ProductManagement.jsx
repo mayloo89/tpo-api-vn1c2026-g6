@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiRequest } from '../services/apiClient.js';
 import './ProductManagement.css';
 
 const initialProductForm = {
@@ -26,9 +27,7 @@ const ProductManagement = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/productos');
-      if (!response.ok) throw new Error('Error al cargar productos');
-      const data = await response.json();
+      const data = await apiRequest('/api/productos');
       setProducts(Array.isArray(data) ? data : data.data || []);
       setMessage('');
     } catch (err) {
@@ -43,29 +42,16 @@ const ProductManagement = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const getAuthHeaders = () => {
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    const headers = { 'Content-Type': 'application/json' };
-    if (user?.token) {
-      headers['Authorization'] = `Bearer ${user.token}`;
-    }
-    return headers;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const url = editingId
-        ? `http://localhost:8080/api/productos/${editingId}`
-        : 'http://localhost:8080/api/productos';
-
+      const path = editingId ? `/api/productos/${editingId}` : '/api/productos';
       const method = editingId ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
+      await apiRequest(path, {
         method,
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           ...formData,
           precio: parseFloat(formData.precio),
@@ -73,16 +59,7 @@ const ProductManagement = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Error en la operación');
-      }
-
-      setMessage(
-        editingId
-          ? 'Producto actualizado exitosamente'
-          : 'Producto creado exitosamente'
-      );
+      setMessage(editingId ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
       setFormData(initialProductForm);
       setEditingId(null);
       setShowForm(false);
@@ -107,16 +84,7 @@ const ProductManagement = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/productos/${id}`,
-        { 
-          method: 'DELETE',
-          headers: getAuthHeaders()
-        }
-      );
-
-      if (!response.ok) throw new Error('Error al eliminar el producto');
-
+      await apiRequest(`/api/productos/${id}`, { method: 'DELETE' });
       setMessage('Producto eliminado exitosamente');
       fetchProducts();
     } catch (err) {

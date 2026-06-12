@@ -1,20 +1,19 @@
 import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { loadCart } from './cartSlice.js'
 import { loadFavorites } from './favoritesSlice.js'
-import { getStoredUser } from '../services/apiClient.js'
+import { selectIsLoggedIn } from './authSlice.js'
 
 const SessionBootstrap = () => {
   const dispatch = useDispatch()
+  const isLoggedIn = useSelector(selectIsLoggedIn)
 
   useEffect(() => {
-    const user = getStoredUser()
-
-    if (user?.token) {
+    if (isLoggedIn) {
       dispatch(loadCart())
       dispatch(loadFavorites())
     }
-  }, [dispatch])
+  }, [dispatch, isLoggedIn])
 
   return null
 }
