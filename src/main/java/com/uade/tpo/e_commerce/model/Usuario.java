@@ -1,6 +1,7 @@
 package com.uade.tpo.e_commerce.model;
 
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -41,6 +42,15 @@ public class Usuario implements UserDetails {
 
     // @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     // private List<Pedido> pedidos;
+
+        @ManyToMany(fetch = FetchType.LAZY)
+        @JoinTable(
+            name = "usuario_favoritos",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "producto_id")
+        )
+        @Builder.Default
+        private List<Producto> favoritos = new ArrayList<>();
 
     /**
      * getAuthorities() devuelve la colección de roles/permisos del usuario
