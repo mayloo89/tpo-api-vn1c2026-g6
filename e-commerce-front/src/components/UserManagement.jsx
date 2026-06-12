@@ -179,17 +179,6 @@ const UserManagement = () => {
             <>
               <p><strong>Nombre:</strong> {user.nombre}</p>
               <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Token JWT:</strong></p>
-              {user.token ? (
-                <textarea
-                  className="user-management__token"
-                  readOnly
-                  value={user.token}
-                  rows={4}
-                />
-              ) : (
-                <p>No disponible</p>
-              )}
               <button type="button" onClick={handleLogout}>Cerrar sesión</button>
             </>
           ) : (
