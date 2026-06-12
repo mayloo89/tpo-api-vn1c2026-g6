@@ -56,31 +56,27 @@ return (
 </button>
 
 <div className="product-detail__card">
-{product.imagen && (
-<img
-src={product.imagen}
-alt={product.nombre}
-className="product-detail__image"
-/>
+{product.imagen ? (
+<img src={product.imagen} alt={product.nombre} className="product-detail__image" />
+) : (
+<div className="product-detail__image--placeholder">Sin imagen</div>
 )}
 <div className="product-detail__info">
 <h1 className="product-detail__name">{product.nombre}</h1>
 <p className="product-detail__description">{product.descripcion}</p>
-<p className="product-detail__price">
-${Number(product.precio).toLocaleString('es-AR')}
-</p>
-          <button type="button" className={favorite ? 'product-detail__favorite is-favorite' : 'product-detail__favorite'} onClick={handleFavoriteClick}>
-            {favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-          </button>
-          <button type="button" className={inCart ? 'product-detail__cart in-cart' : 'product-detail__cart'} onClick={handleAddToCart}>
-            {inCart ? 'En el carrito' : 'Agregar al carrito'}
-          </button>
+<p className="product-detail__price">${Number(product.precio).toLocaleString('es-AR')}</p>
 <span className={`product-detail__stock ${product.stock > 0 ? 'en-stock' : 'sin-stock'}`}>
-{product.stock > 0 ? `Stock disponible: ${product.stock}` : 'Agotado'}
+  {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
 </span>
-<Link to="/products" className="product-detail__link">
-Ver todos los productos
-</Link>
+<div className="product-detail__actions">
+  <button type="button" className={favorite ? 'product-detail__favorite is-favorite' : 'product-detail__favorite'} onClick={handleFavoriteClick}>
+    {favorite ? '♥ Quitar de favoritos' : '♡ Agregar a favoritos'}
+  </button>
+  <button type="button" className={inCart ? 'product-detail__cart in-cart' : 'product-detail__cart'} onClick={handleAddToCart} disabled={inCart}>
+    {inCart ? 'En el carrito' : 'Agregar al carrito'}
+  </button>
+</div>
+<Link to="/products" className="product-detail__link">← Ver todos los productos</Link>
 </div>
 </div>
 </div>
