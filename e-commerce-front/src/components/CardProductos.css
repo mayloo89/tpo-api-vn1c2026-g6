@@ -143,6 +143,12 @@
   border-top: 1px solid #eee;
 }
 
+.producto-footer__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .producto-precio {
   font-size: 1.5rem;
   font-weight: 700;
@@ -170,4 +176,25 @@
 
 .btn-agregar:active {
   transform: scale(0.98);
+}
+
+.btn-carrito {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.btn-carrito:hover {
+  background: #bfdbfe;
+}
+
+.btn-carrito.in-cart {
+  background: #1d4ed8;
+  color: white;
 }

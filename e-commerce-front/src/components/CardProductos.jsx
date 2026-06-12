@@ -1,10 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../context/FavoriteContext.jsx'
+import { useCart } from '../context/CartContext.jsx'
 import './CardProductos.css'
 
 const CardProductos = ({ product }) => {
   const { addToFavorite, removeFromFavorite, isFavorite } = useFavorites()
+  const { addToCart, isInCart } = useCart()
   const productId = product.id ?? product._id ?? product.codigo
   const favorite = isFavorite(productId)
 
@@ -18,6 +20,12 @@ const CardProductos = ({ product }) => {
     }
 
     addToFavorite(product)
+  }
+
+  const handleAddToCart = event => {
+    event.preventDefault()
+    event.stopPropagation()
+    addToCart(product)
   }
 
   return (
@@ -50,14 +58,23 @@ const CardProductos = ({ product }) => {
           <span className="stars">⭐ {product.rating}</span>
         </div>
 
-        <div className="producto-footer">
-          <span className={product.stock > 0 ? 'en-stock' : 'sin-stock'}>
-            {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
-          </span>
-          <Link to={`/products/${productId}`} className="btn-agregar">
-            Ver detalle
-          </Link>
-        </div>
+  <div className="producto-footer">
+  <span className={product.stock > 0 ? 'en-stock' : 'sin-stock'}>
+    {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
+  </span>
+  <div className="producto-footer__actions">
+    <button
+      type="button"
+      className={isInCart(productId) ? 'btn-carrito in-cart' : 'btn-carrito'}
+      onClick={handleAddToCart}
+    >
+      {isInCart(productId) ? 'En carrito' : 'Carrito'}
+    </button>
+    <Link to={`/products/${productId}`} className="btn-agregar">
+      Ver detalle
+    </Link>
+  </div>
+</div>
       </div>
     </article>
   )

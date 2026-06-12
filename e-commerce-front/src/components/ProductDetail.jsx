@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useFavorites } from '../context/FavoriteContext.jsx';
+import { useCart } from '../context/CartContext.jsx';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
 const { id } = useParams();
 const navigate = useNavigate();
-const { addToFavorite, removeFromFavorite, isFavorite } = useFavorites();
+  const { addToFavorite, removeFromFavorite, isFavorite } = useFavorites();
+  const { addToCart, isInCart } = useCart();
 const [product, setProduct] = useState(null);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
@@ -34,14 +36,18 @@ if (!product) return <div className="product-detail__error">Producto no encontra
 
 const productId = product.id ?? product._id ?? product.codigo;
 const favorite = isFavorite(productId);
-const handleFavoriteClick = () => {
-if (favorite) {
-removeFromFavorite(productId);
-return;
-}
+  const handleFavoriteClick = () => {
+    if (favorite) {
+      removeFromFavorite(productId);
+      return;
+    }
 
-addToFavorite(product);
-};
+    addToFavorite(product);
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product);
+  };
 
 return (
 <div className="product-detail">
@@ -63,9 +69,12 @@ className="product-detail__image"
 <p className="product-detail__price">
 ${Number(product.precio).toLocaleString('es-AR')}
 </p>
-<button type="button" className={favorite ? 'product-detail__favorite is-favorite' : 'product-detail__favorite'} onClick={handleFavoriteClick}>
-{favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-</button>
+          <button type="button" className={favorite ? 'product-detail__favorite is-favorite' : 'product-detail__favorite'} onClick={handleFavoriteClick}>
+            {favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+          </button>
+          <button type="button" className={isInCart(productId) ? 'product-detail__cart in-cart' : 'product-detail__cart'} onClick={handleAddToCart}>
+            {isInCart(productId) ? 'En el carrito' : 'Agregar al carrito'}
+          </button>
 <span className={`product-detail__stock ${product.stock > 0 ? 'en-stock' : 'sin-stock'}`}>
 {product.stock > 0 ? `Stock disponible: ${product.stock}` : 'Agotado'}
 </span>

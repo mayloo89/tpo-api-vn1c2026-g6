@@ -74,8 +74,24 @@ cursor: pointer;
 }
 
 .product-detail__favorite.is-favorite {
-background: #dc2626;
-color: white;
+  background: #dc2626;
+  color: white;
+}
+
+.product-detail__cart {
+  align-self: flex-start;
+  border: none;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.product-detail__cart.in-cart {
+  background: #1d4ed8;
+  color: white;
 }
 
 .product-detail__stock {
