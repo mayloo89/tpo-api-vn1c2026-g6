@@ -116,6 +116,26 @@ input::placeholder, textarea::placeholder {
   color: var(--text-dim);
 }
 
+/* Tema claro */
+:root.theme-light {
+  --bg:           oklch(0.98 0.004 160);
+  --surface:      oklch(0.95 0.004 160);
+  --surface-2:    oklch(0.91 0.005 160);
+  --surface-3:    oklch(0.87 0.006 160);
+
+  --border:       oklch(0.83 0.008 160);
+  --border-focus: oklch(0.45 0.18  150);
+
+  --text:         oklch(0.18 0.012 160);
+  --text-muted:   oklch(0.42 0.010 160);
+  --text-dim:     oklch(0.62 0.008 160);
+
+  --accent:       oklch(0.42 0.18  150);
+  --accent-hover: oklch(0.36 0.18  150);
+  --accent-dim:   oklch(0.42 0.12  150 / 0.12);
+  --accent-text:  oklch(0.98 0.003 160);
+}
+
 /* Stock badges — compartidos entre componentes */
 .en-stock {
   color: var(--success);

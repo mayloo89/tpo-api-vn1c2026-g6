@@ -57,6 +57,26 @@
   background: var(--accent-dim);
 }
 
+.nav-theme-toggle {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 150ms var(--ease-out),
+              border-color 150ms var(--ease-out),
+              background-color 150ms var(--ease-out);
+}
+
+.nav-theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+  background: var(--surface-2);
+}
+
 @media (max-width: 640px) {
   .navbar-container {
     padding: 0 1rem;

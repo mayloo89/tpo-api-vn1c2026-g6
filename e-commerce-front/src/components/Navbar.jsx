@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { selectCartCount } from '../store/cartSlice.js'
 import { selectFavoriteItems } from '../store/favoritesSlice.js'
 import { selectUser } from '../store/authSlice.js'
+import { useTheme } from '../context/ThemeContext.jsx'
 import '../styles/Navbar.css'
 
 function Navbar() {
@@ -10,6 +11,7 @@ function Navbar() {
   const favoriteItems = useSelector(selectFavoriteItems)
   const cartCount = useSelector(selectCartCount)
   const user = useSelector(selectUser)
+  const { theme, toggleTheme } = useTheme()
 
 const isActive = (path) => {
 if (path === '/products') return location.pathname.startsWith('/products')
@@ -55,6 +57,11 @@ Gestion
 <Link to="/auth" className={isActive('/auth') ? 'nav-link active' : 'nav-link'}>
 {user ? 'Mi Cuenta' : 'Ingresar'}
 </Link>
+</li>
+<li>
+  <button type="button" className="nav-theme-toggle" onClick={toggleTheme} aria-label="Cambiar tema">
+    {theme === 'dark' ? 'Claro' : 'Oscuro'}
+  </button>
 </li>
 </ul>
 </div>
