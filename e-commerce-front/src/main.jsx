@@ -14,10 +14,12 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Cart from './components/Cart.jsx'
 import store from './store/store.js'
 import SessionBootstrap from './store/sessionBootstrap.js'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <Provider store={store}>
+            <ThemeProvider>
             <BrowserRouter>
                 <SessionBootstrap />
                 <Navbar />
@@ -33,6 +35,7 @@ createRoot(document.getElementById('root')).render(
                     </Route>
                 </Routes>
             </BrowserRouter>
+            </ThemeProvider>
         </Provider>
     </StrictMode>,
 )
