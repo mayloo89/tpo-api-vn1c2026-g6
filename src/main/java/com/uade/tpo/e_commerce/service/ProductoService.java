@@ -30,7 +30,8 @@ public class ProductoService {
                         producto.getNombre(),
                         producto.getDescripcion(),
                         producto.getPrecio(),
-                        producto.getStock()))
+                        producto.getStock(),
+                        producto.getImagenUrl()))
                 .collect(Collectors.toList());
     }
 
@@ -70,6 +71,7 @@ public class ProductoService {
                 .descripcion(productoDTO.getDescripcion())
                 .precio(productoDTO.getPrecio())
                 .stock(productoDTO.getStock())
+                .imagenUrl(productoDTO.getImagen())
                 .build();
         
         Producto productoAdd= productoRepository.save(producto);
