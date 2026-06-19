@@ -32,7 +32,7 @@ class ProductoServiceTest {
 
     @Test
     void saveProducto_rechazaPrecioNegativo() {
-        ProductoRequestDTO request = new ProductoRequestDTO("Nombre", "Desc", -1.0, 5);
+        ProductoRequestDTO request = new ProductoRequestDTO("Nombre", "Desc", -1.0, 5, null);
 
         assertThatThrownBy(() -> productoService.saveProducto(request))
                 .isInstanceOf(PrecioNegativoException.class);
@@ -49,7 +49,7 @@ class ProductoServiceTest {
 
     @Test
     void saveProducto_devuelveResponse() {
-        ProductoRequestDTO request = new ProductoRequestDTO("Nombre", "Desc", 10.0, 5);
+        ProductoRequestDTO request = new ProductoRequestDTO("Nombre", "Desc", 10.0, 5, null);
         Producto saved = Producto.builder()
                 .id(1L)
                 .nombre("Nombre")

@@ -42,7 +42,7 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
-    // private String imagenUrl;
+    private String imagenUrl;
     
     @Default
     @ManyToMany(fetch = FetchType.LAZY)
