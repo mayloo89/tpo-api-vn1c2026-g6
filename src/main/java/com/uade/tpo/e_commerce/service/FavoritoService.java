@@ -71,6 +71,7 @@ public class FavoritoService {
                 producto.getNombre(),
                 producto.getDescripcion(),
                 producto.getPrecio(),
-                producto.getStock());
+                producto.getStock(),
+                producto.getImagenUrl());
     }
 }

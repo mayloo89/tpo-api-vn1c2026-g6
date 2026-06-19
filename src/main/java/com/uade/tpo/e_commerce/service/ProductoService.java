@@ -45,7 +45,8 @@ public class ProductoService {
                 producto.getNombre(),
                 producto.getDescripcion(),
                 producto.getPrecio(),
-                producto.getStock());
+                producto.getStock(),
+                producto.getImagenUrl());
         return productoResponse;
     }
 
@@ -80,7 +81,8 @@ public class ProductoService {
                 productoAdd.getNombre(),
                 productoAdd.getDescripcion(),
                 productoAdd.getPrecio(),
-                productoAdd.getStock());
+                productoAdd.getStock(),
+                productoAdd.getImagenUrl());
         return productoResponseAdd;
     }
 
@@ -107,7 +109,8 @@ public class ProductoService {
             productoActualizado.getNombre(),
             productoActualizado.getDescripcion(),
             productoActualizado.getPrecio(),
-            productoActualizado.getStock());
+            productoActualizado.getStock(),
+            productoActualizado.getImagenUrl());
 }
 
 }
