@@ -25,29 +25,43 @@ public class ProductoService {
     
     public List<ProductoResponseDTO> getAllProductos() {
         return productoRepository.findAll().stream()
-                .map(producto -> new ProductoResponseDTO(
-                        producto.getId(),
-                        producto.getNombre(),
-                        producto.getDescripcion(),
-                        producto.getPrecio(),
-                        producto.getStock(),
-                        producto.getImagenUrl()))
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public ProductoResponseDTO getProductoById(Long id) {
-        Producto producto = productoRepository.findById(id).orElse(null);
-        if (producto == null) {
-            throw new ProductoNotFoundException("Producto no encontrado con id: " + id );
+    public List<ProductoResponseDTO> buscarProductos(String nombre, Double precioMax) {
+        List<Producto> resultados;
+
+        if (nombre != null && !nombre.isBlank()) {
+            resultados = productoRepository.findByNombreContaining(nombre);
+            if (precioMax != null) {
+                resultados = resultados.stream()
+                        .filter(p -> p.getPrecio() < precioMax)
+                        .collect(Collectors.toList());
+            }
+        } else if (precioMax != null) {
+            resultados = productoRepository.findByPrecioLessThan(precioMax);
+        } else {
+            resultados = productoRepository.findAll();
         }
-        ProductoResponseDTO productoResponse = new ProductoResponseDTO(
+
+        return resultados.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    private ProductoResponseDTO toDTO(Producto producto) {
+        return new ProductoResponseDTO(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getDescripcion(),
                 producto.getPrecio(),
                 producto.getStock(),
                 producto.getImagenUrl());
-        return productoResponse;
+    }
+
+    public ProductoResponseDTO getProductoById(Long id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ProductoNotFoundException("Producto no encontrado con id: " + id));
+        return toDTO(producto);
     }
 
     public void deleteProductoById(Long id) {
@@ -75,15 +89,7 @@ public class ProductoService {
                 .imagenUrl(productoDTO.getImagen())
                 .build();
         
-        Producto productoAdd= productoRepository.save(producto);
-        ProductoResponseDTO productoResponseAdd = new ProductoResponseDTO(
-                productoAdd.getId(),
-                productoAdd.getNombre(),
-                productoAdd.getDescripcion(),
-                productoAdd.getPrecio(),
-                productoAdd.getStock(),
-                productoAdd.getImagenUrl());
-        return productoResponseAdd;
+        return toDTO(productoRepository.save(producto));
     }
 
 
@@ -104,13 +110,7 @@ public class ProductoService {
 
     Producto productoActualizado = productoRepository.save(producto);
 
-    return new ProductoResponseDTO(
-            productoActualizado.getId(),
-            productoActualizado.getNombre(),
-            productoActualizado.getDescripcion(),
-            productoActualizado.getPrecio(),
-            productoActualizado.getStock(),
-            productoActualizado.getImagenUrl());
+    return toDTO(productoActualizado);
 }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -38,8 +39,10 @@ public class ProductoController {
      * @return lista de todos los productos
      */
     @GetMapping
-    public List<ProductoResponseDTO> getAllProductos() {
-        return productoService.getAllProductos();
+    public List<ProductoResponseDTO> getAllProductos(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Double precioMax) {
+        return productoService.buscarProductos(nombre, precioMax);
     }
 
     /**
