@@ -6,6 +6,8 @@ import { addToFavorite, removeFromFavorite, selectIsFavorite } from '../store/fa
 import { apiRequest } from '../services/apiClient.js';
 import './ProductDetail.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 const ProductDetail = () => {
 const { id } = useParams();
 const navigate = useNavigate();
@@ -57,7 +59,7 @@ return (
 
 <div className="product-detail__card">
 {product.imagen ? (
-<img src={product.imagen} alt={product.nombre} className="product-detail__image" />
+<img src={`${API_BASE_URL}${product.imagen}`} alt={product.nombre} className="product-detail__image" />
 ) : (
 <div className="product-detail__image--placeholder">Sin imagen</div>
 )}

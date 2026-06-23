@@ -10,6 +10,8 @@ import {
 } from '../store/cartSlice.js'
 import './Cart.css'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 const Cart = () => {
   const dispatch = useDispatch()
   const cartItems = useSelector(selectCartItems)
@@ -44,7 +46,7 @@ const Cart = () => {
                 <article key={productId} className="cart-card">
                   {product.imagen ? (
                     <img
-                      src={product.imagen}
+                      src={`${API_BASE_URL}${product.imagen}`}
                       alt={product.nombre}
                       className="cart-card__image"
                     />
@@ -68,7 +70,14 @@ const Cart = () => {
                       <button
                         type="button"
                         className="cart-card__qty-btn"
-                        onClick={() => dispatch(updateQuantity({ productId, quantity: product.quantity - 1 }))}
+                        disabled={product.quantity <= 1}
+                        onClick={() => {
+                          if (product.quantity === 1) {
+                            dispatch(removeFromCart(productId))
+                          } else {
+                            dispatch(updateQuantity({ productId, quantity: product.quantity - 1 }))
+                          }
+                        }}
                       >
                         −
                       </button>

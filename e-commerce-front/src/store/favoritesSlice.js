@@ -1,18 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { getProductId, normalizeProduct } from './productHelpers.js'
-import { apiRequest, getStoredUser } from '../services/apiClient.js'
+import { apiRequest } from '../services/apiClient.js'
 
 const initialState = {
   items: [],
 }
 
 export const loadFavorites = createAsyncThunk('favorites/loadFavorites', async () => {
-  const user = getStoredUser()
-
-  if (!user?.token) {
-    return []
-  }
-
   const response = await apiRequest('/api/favoritos')
   return Array.isArray(response) ? response.map(normalizeProduct) : []
 })

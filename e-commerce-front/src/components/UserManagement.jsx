@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loadCart, resetCart } from '../store/cartSlice.js';
 import { loadFavorites, resetFavorites } from '../store/favoritesSlice.js';
-import { loginThunk, registerThunk, logout, clearAuthError, selectUser, selectAuthStatus, selectAuthError } from '../store/authSlice.js';
+import { loginThunk, registerThunk, logoutThunk, clearAuthError, selectUser, selectAuthStatus, selectAuthError } from '../store/authSlice.js';
 import './UserManagement.css';
 
 const initialRegister = {
@@ -25,7 +25,11 @@ const UserManagement = () => {
   const authStatus = useSelector(selectAuthStatus);
   const authError = useSelector(selectAuthError);
 
-  const [mode, setMode] = useState(user ? 'profile' : 'login');
+  const [mode, setMode] = useState('login');
+
+  useEffect(() => {
+    setMode(user ? 'profile' : 'login')
+  }, [user])
   const [registerData, setRegisterData] = useState(initialRegister);
   const [loginData, setLoginData] = useState(initialLogin);
   const [message, setMessage] = useState('');
@@ -71,8 +75,8 @@ const UserManagement = () => {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await dispatch(logoutThunk());
     dispatch(resetCart());
     dispatch(resetFavorites());
     setMode('login');

@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { removeFromFavorite, selectFavoriteItems } from '../store/favoritesSlice.js'
 import './Favorite.css'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 const Favorite = () => {
     const dispatch = useDispatch()
     const favoriteItems = useSelector(selectFavoriteItems)
@@ -32,7 +34,7 @@ const Favorite = () => {
                             <article key={productId} className="favorite-card">
                                 {product.imagen ? (
                                     <img
-                                        src={product.imagen}
+                                        src={`${API_BASE_URL}${product.imagen}`}
                                         alt={product.nombre}
                                         className="favorite-card__image"
                                     />
