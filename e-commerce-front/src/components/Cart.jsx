@@ -4,7 +4,9 @@ import {
   clearCart,
   removeFromCart,
   selectCartCount,
+  selectCartError,
   selectCartItems,
+  selectCartStatus,
   selectCartTotal,
   updateQuantity,
 } from '../store/cartSlice.js'
@@ -17,6 +19,16 @@ const Cart = () => {
   const cartItems = useSelector(selectCartItems)
   const cartTotal = useSelector(selectCartTotal)
   const cartCount = useSelector(selectCartCount)
+  const cartStatus = useSelector(selectCartStatus)
+  const cartError = useSelector(selectCartError)
+
+  if (cartStatus === 'loading') {
+    return <div className="cart-page__loading">Cargando carrito...</div>
+  }
+
+  if (cartStatus === 'failed') {
+    return <div className="cart-page__error">Error al cargar el carrito: {cartError}</div>
+  }
 
   return (
     <section className="cart-page">

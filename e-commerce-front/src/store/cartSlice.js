@@ -23,6 +23,8 @@ const normalizeCartResponse = response => {
 
 const initialState = {
   items: [],
+  status: 'idle',
+  error: null,
 }
 
 export const loadCart = createAsyncThunk('cart/loadCart', async () => {
@@ -72,25 +74,43 @@ const cartSlice = createSlice({
   reducers: {
     resetCart(state) {
       state.items = []
+      state.status = 'idle'
+      state.error = null
     },
   },
   extraReducers: builder => {
+    const pending = state => {
+      state.status = 'loading'
+      state.error = null
+    }
+    const rejected = (state, action) => {
+      state.status = 'failed'
+      state.error = action.error.message
+    }
+    const fulfilled = (state, action) => {
+      state.status = 'succeeded'
+      state.items = action.payload
+    }
+
     builder
-      .addCase(loadCart.fulfilled, (state, action) => {
-        state.items = action.payload
-      })
-      .addCase(addToCart.fulfilled, (state, action) => {
-        state.items = action.payload
-      })
-      .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.items = action.payload
-      })
-      .addCase(updateQuantity.fulfilled, (state, action) => {
-        state.items = action.payload
-      })
+      .addCase(loadCart.pending, pending)
+      .addCase(loadCart.fulfilled, fulfilled)
+      .addCase(loadCart.rejected, rejected)
+      .addCase(addToCart.pending, pending)
+      .addCase(addToCart.fulfilled, fulfilled)
+      .addCase(addToCart.rejected, rejected)
+      .addCase(removeFromCart.pending, pending)
+      .addCase(removeFromCart.fulfilled, fulfilled)
+      .addCase(removeFromCart.rejected, rejected)
+      .addCase(updateQuantity.pending, pending)
+      .addCase(updateQuantity.fulfilled, fulfilled)
+      .addCase(updateQuantity.rejected, rejected)
+      .addCase(clearCart.pending, pending)
       .addCase(clearCart.fulfilled, state => {
+        state.status = 'succeeded'
         state.items = []
       })
+      .addCase(clearCart.rejected, rejected)
   },
 })
 
@@ -98,6 +118,8 @@ export const { resetCart } = cartSlice.actions
 export default cartSlice.reducer
 
 export const selectCartItems = state => state.cart.items
+export const selectCartStatus = state => state.cart.status
+export const selectCartError = state => state.cart.error
 export const selectCartCount = state =>
   state.cart.items.reduce((count, item) => count + item.quantity, 0)
 export const selectCartTotal = state =>

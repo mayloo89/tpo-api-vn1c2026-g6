@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { removeFromFavorite, selectFavoriteItems } from '../store/favoritesSlice.js'
+import { removeFromFavorite, selectFavoriteItems, selectFavoritesStatus, selectFavoritesError } from '../store/favoritesSlice.js'
 import './Favorite.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
@@ -8,6 +8,16 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 const Favorite = () => {
     const dispatch = useDispatch()
     const favoriteItems = useSelector(selectFavoriteItems)
+    const favoritesStatus = useSelector(selectFavoritesStatus)
+    const favoritesError = useSelector(selectFavoritesError)
+
+    if (favoritesStatus === 'loading') {
+        return <div className="favorite-page__loading">Cargando favoritos...</div>
+    }
+
+    if (favoritesStatus === 'failed') {
+        return <div className="favorite-page__error">Error al cargar favoritos: {favoritesError}</div>
+    }
 
     return (
         <section className="favorite-page">
