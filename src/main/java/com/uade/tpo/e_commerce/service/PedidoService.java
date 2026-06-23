@@ -166,13 +166,14 @@ public class PedidoService {
                         item.getProducto().getId(),
                         item.getProducto().getNombre(),
                         item.getCantidad(),
-                        item.getPrecioUnitario()))
+                        item.getPrecioUnitario(),
+                        item.getProducto().getImagenUrl()))
                 .collect(Collectors.toList());
 
         return new PedidoResponseDTO(
                 pedido.getId(),
                 pedido.getUsuario().getId(),
-            pedido.getEstado() != null ? pedido.getEstado().name() : PedidoEstado.CONFIRMADO.name(),
+                pedido.getEstado() != null ? pedido.getEstado().name() : PedidoEstado.CONFIRMADO.name(),
                 pedido.getTotal(),
                 items);
     }

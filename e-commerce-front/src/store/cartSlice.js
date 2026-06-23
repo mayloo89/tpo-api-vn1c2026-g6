@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { getProductId } from './productHelpers.js'
-import { apiRequest, getStoredUser } from '../services/apiClient.js'
+import { apiRequest } from '../services/apiClient.js'
 
 const normalizeCartItem = item => ({
   id: item.productoId ?? item.id,
@@ -9,6 +9,7 @@ const normalizeCartItem = item => ({
   precio: item.precioUnitario ?? item.precio,
   stock: item.stock,
   quantity: item.cantidad ?? item.quantity ?? 1,
+  imagen: item.imagen ?? null,
 })
 
 const normalizeCartResponse = response => {
@@ -25,12 +26,6 @@ const initialState = {
 }
 
 export const loadCart = createAsyncThunk('cart/loadCart', async () => {
-  const user = getStoredUser()
-
-  if (!user?.token) {
-    return []
-  }
-
   const response = await apiRequest('/api/carrito')
   return normalizeCartResponse(response)
 })

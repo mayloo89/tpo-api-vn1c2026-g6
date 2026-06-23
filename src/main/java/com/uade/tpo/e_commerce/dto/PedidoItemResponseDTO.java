@@ -14,4 +14,5 @@ public class PedidoItemResponseDTO {
     private String nombreProducto;
     private Integer cantidad;
     private Double precioUnitario;
+    private String imagen;
 }

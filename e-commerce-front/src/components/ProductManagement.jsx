@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { apiRequest } from '../services/apiClient.js';
-import { getAuthToken } from '../services/apiClient.js';
+import { loadCart } from '../store/cartSlice.js';
+import { loadFavorites } from '../store/favoritesSlice.js';
 import './ProductManagement.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -14,6 +16,7 @@ const initialProductForm = {
 };
 
 const ProductManagement = () => {
+  const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState(initialProductForm);
   const [imageFile, setImageFile] = useState(null);
@@ -75,7 +78,7 @@ const ProductManagement = () => {
         formDataImg.append('archivo', imageFile);
         await fetch(`${API_BASE_URL}/api/productos/${saved.id}/imagen`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${getAuthToken()}` },
+          credentials: 'include',
           body: formDataImg,
         });
       }
@@ -83,6 +86,8 @@ const ProductManagement = () => {
       setMessage(editingId ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
       resetForm();
       fetchProducts();
+      dispatch(loadFavorites());
+      dispatch(loadCart());
     } catch (err) {
       setMessage(`Error: ${err.message}`);
     } finally {

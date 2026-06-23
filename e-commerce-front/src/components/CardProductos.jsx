@@ -4,6 +4,8 @@ import { addToCart, selectIsInCart } from '../store/cartSlice.js'
 import { addToFavorite, removeFromFavorite, selectIsFavorite } from '../store/favoritesSlice.js'
 import './CardProductos.css'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 const CardProductos = ({ product }) => {
   const dispatch = useDispatch()
   const productId = product.id ?? product._id ?? product.codigo
@@ -33,7 +35,7 @@ const CardProductos = ({ product }) => {
       <div className="producto-imagen-container">
         {product.imagen ? (
           <img
-            src={product.imagen}
+            src={`${API_BASE_URL}${product.imagen}`}
             alt={product.nombre}
             className="producto-imagen"
           />

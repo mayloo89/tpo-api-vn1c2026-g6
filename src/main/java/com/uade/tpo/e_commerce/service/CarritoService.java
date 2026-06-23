@@ -145,7 +145,8 @@ public class CarritoService {
                         item.getProducto().getId(),
                         item.getProducto().getNombre(),
                         item.getCantidad(),
-                        item.getPrecioUnitario()))
+                        item.getPrecioUnitario(),
+                        item.getProducto().getImagenUrl()))
                 .toList();
 
         return new PedidoResponseDTO(
